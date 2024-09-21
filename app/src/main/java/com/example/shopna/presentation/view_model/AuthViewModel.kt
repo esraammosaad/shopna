@@ -53,7 +53,7 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
                     }
                     if (getUser()) {
                         println("User registered successfully: ${_user.value}")
-                        navigator.push(HomeScreen())
+                        navigator.push(HomeScreen(MainViewModel()))
                     }
                 } else {
                     Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
@@ -76,7 +76,7 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
                     _userLoginResponse.value?.let { RetrofitInstance.setAuthToken(it.data.token) }
                     if (getUser()) {
                         println("==========================================================${_user.value}")
-                      navigator.push(HomeScreen())
+                      navigator.push(HomeScreen(MainViewModel()))
                     }
                 } else {
                     Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
