@@ -1,4 +1,5 @@
 [versions]
+
 accompanistPagerVersion = "0.31.5-beta"
 accompanistSystemuicontrollerVersion = "<version>"
 agp = "8.5.1"
