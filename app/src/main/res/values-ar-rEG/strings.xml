@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">شوبنا.</string>
+    <string name="onboarding_title1">اكتشف عالم المنتجات</string>
+    <string name="onboarding_desc1">تصفح واشتري مجموعة واسعة من العناصر، من الموضة إلى الإلكترونيات، كل ذلك في متناول يدك. استمتع بتجربة تسوق سلسة مصممة خصيصًا لك.</string>
+    <string name="onboarding_title2">توصيل سريع وموثوق</string>
+    <string name="onboarding_desc2">احصل على طلباتك إلى باب منزلك باستخدام خدمتنا الفعالة والموثوقة. تتبع طلبك في كل خطوة على الطريق.</string>
+    <string name="onboarding_title3">مدفوعات آمنة وسهلة</string>
+    <string name="onboarding_desc3">ادفع بثقة باستخدام بطاقتك الائتمانية. يضمن بوابة الدفع الآمنة لدينا عملية سلسة وآمنة في كل مرة.</string>
+    <string name="skip">تخطي</string>
+    <string name="next">التالي</string>
+    <string name="getStarted">أبدأ الأن</string>
+    <string name="welcome_back">مرحبًا بعودتك</string>
+    <string name="welcome_message">نحن متحمسون لعودتك، لا نستطيع الانتظار لمعرفة ما كنت تقوم به منذ آخر مرة قمت فيها بتسجيل الدخول.</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="signup_message">سجل الآن وابدأ في استكشاف كل ما يقدمه تطبيقنا. نحن متحمسون للترحيب بك في مجتمعنا!</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="password">كلمة المرور</string>
+    <string name="remember_me">تذكرني</string>
+    <string name="forget_password">نسيت كلمة المرور؟</string>
+    <string name="sign_in">تسجيل الدخول</string>
+    <string name="logging">تسجيل الدخول</string>
+    <string name="already_have_account">هل لديك حساب بالفعل؟ </string>
+    <string name="sign_up">سجل</string>
+    <string name="login">تسجيل الدخول </string>
+    <string name="email_empty_error">لا يمكن أن يكون البريد الإلكتروني فارغًا</string>
+    <string name="invalid_email_error">عنوان البريد الإلكتروني غير صالح</string>
+    <string name="password_empty_error">لا يمكن أن تكون كلمة المرور فارغة</string>
+    <string name="password_length_error">يجب أن تتكون كلمة المرور من 6 أحرف على الأقل</string>
+    <string name="terms_conditions">الشروط والأحكام</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="or_with">أو %1$s باستخدام</string>
+    <string name="by_agree">عبر %1$s، أنت توافق على</string>
+    <string name="and">و</string>
+    <string name="username_empty_error">لا يمكن أن يكون اسم المستخدم فارغًا</string>
+    <string name="username_length_error">يجب أن يتكون اسم المستخدم من 3 أحرف على الأقل</string>
+    <string name="phone_number_empty_error">لا يمكن أن يكون رقم الهاتف فارغًا</string>
+    <string name="phone_number_digits_error">يجب أن يحتوي رقم الهاتف على أرقام فقط</string>
+    <string name="phone_number_length_error">يجب أن يتكون رقم الهاتف من 10 أرقام على الأقل</string>
+    <string name="create_account_button">إنشاء حساب</string>
+    <string name="signing_up">جارٍ التسجيل</string>
+    <string name="no_account_yet">لا تملك حسابًا بعد؟</string>
+    <string name="username">اسم المستخدم</string>
+    <string name="phone_number">رقم الهاتف</string>
+
+
+</resources>

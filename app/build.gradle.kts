@@ -50,7 +50,21 @@ android {
 }
 
 dependencies {
+    implementation("com.google.accompanist:accompanist-pager:0.32.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
 
+    implementation("io.coil-kt:coil-compose:2.7.0")
+// Retrofit & Converter
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+// interceptor to debug network calls
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    val voyagerVersion = "1.1.0-beta02"
+    implementation( "com.airbnb.android:lottie-compose:5.2.0")
+    implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+    val nav_version = "2.7.7"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("androidx.compose.material3:material3:1.3.0-beta05")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

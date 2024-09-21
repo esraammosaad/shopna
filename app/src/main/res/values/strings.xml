@@ -1,3 +1,52 @@
 <resources>
-    <string name="app_name">Shopna</string>
+    <string name="app_name">Shopna.</string>
+    <string name="onboarding_title1">Discover a World of Products</string>
+    <string name="onboarding_desc1">Browse and shop a wide range of items, from fashion to electronics, all at your fingertips. Enjoy a seamless shopping experience tailored just for you.</string>
+
+    <string name="onboarding_title2">Fast and Reliable Delivery</string>
+    <string name="onboarding_desc2">Get your orders delivered to your doorstep with our efficient and reliable delivery service. Track your order every step of the way.</string>
+
+    <string name="onboarding_title3">Secure and Easy Payments</string>
+    <string name="onboarding_desc3">Pay with confidence using your credit card. Our secure payment gateway ensures a smooth and safe transaction every time.</string>
+
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="getStarted">Get Started</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="welcome_message">We\'re excited to have you back, can\'t wait to see what you\'ve been up to since you last logged in.</string>
+
+    <string name="create_account">Create Account</string>
+    <string name="signup_message">Sign up now and start exploring all that our app has to offer. We\'re excited to welcome you to our community!</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forget_password">Forget password?</string>
+    <string name="sign_in">sign in</string>
+    <string name="logging">logging</string>
+    <string name="already_have_account">Already have an account yet? </string>
+    <string name="sign_up">Sign Up</string>
+    <string name="login">Login </string>
+    <string name="email_empty_error">Email cannot be empty</string>
+    <string name="invalid_email_error">Invalid email address</string>
+    <string name="password_empty_error">Password cannot be empty</string>
+    <string name="password_length_error">Password must be at least 6 characters</string>
+    <string name="terms_conditions"> Terms &amp; Conditions</string>
+    <string name="privacy_policy">PrivacyPolicy</string>
+    <string name="or_with">Or %1$s with</string>
+    <string name="by_agree">By %1$s, you agree to our </string>
+    <string name="and">and</string>
+    <string name="username_empty_error">Username cannot be empty</string>
+    <string name="username_length_error">Username must be at least 3 characters</string>
+    <string name="phone_number_empty_error">Phone number cannot be empty</string>
+    <string name="phone_number_digits_error">Phone number must contain only digits</string>
+    <string name="phone_number_length_error">Phone number must be at least 10 digits</string>
+    <string name="create_account_button">Create Account</string>
+    <string name="signing_up">Signing up</string>
+    <string name="no_account_yet">Don\'t have an account yet?</string>
+    <string name="username">Username</string>
+    <string name="phone_number">Phone Number</string>
+
+
+
 </resources>
