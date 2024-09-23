@@ -33,20 +33,15 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import coil.compose.AsyncImage
 import com.example.shopna.data.model.FavoriteProducts
-import com.example.shopna.presentation.view_model.MainViewModel
+import com.example.shopna.presentation.view_model.HomeViewModel
 
-
-class FavoriteScreen(val mainViewModel: MainViewModel) : Screen {
-    @Composable
-    override fun Content() {
-        val favorites = mainViewModel.favoritesList.collectAsState()
+@Composable
+fun FavoriteScreen(mainViewModel: HomeViewModel){
+    val favorites = mainViewModel.favoritesList.collectAsState()
         // val favorites by mainViewModel.fetchFavorites().collectAsState(initial = emptyList()) // تأكد من تعيين قيمة ابتدائية
         Column {
-            Scaffold(
-                topBar = { TopBar() },
-                bottomBar = { BottomNavigationBar(mainViewModel) }
-            ) {innerPadding ->
-                Text(text = "Favorite", modifier = Modifier.padding(innerPadding).padding(start = 12.dp, top = 15.dp)
+
+                Text(text = "Favorite", modifier = Modifier.padding(start = 12.dp, top = 15.dp)
                     , style = TextStyle(fontSize = 25.sp)
                 )
                 LazyColumn(
@@ -63,12 +58,12 @@ class FavoriteScreen(val mainViewModel: MainViewModel) : Screen {
 
                 }
 
-            }
+
         }
-    }
+
 }
 @Composable
-fun FavoriteItem(favoriteProduct: FavoriteProducts, mainViewModel: MainViewModel) {
+fun FavoriteItem(favoriteProduct: FavoriteProducts, mainViewModel: HomeViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

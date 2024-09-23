@@ -1,20 +1,14 @@
 package com.example.shopna.presentation.view_model
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.Navigator
-import com.example.shopna.data.model.GetUserResponse
-import com.example.shopna.data.model.LoginRequest
-import com.example.shopna.data.model.LoginResponse
-import com.example.shopna.data.model.RegisterRequest
-import com.example.shopna.data.model.RegisterResponse
+import com.example.shopna.data.model.*
 import com.example.shopna.data.network.RetrofitInstance
-import com.example.shopna.presentation.view.home.HomeScreen
+import com.example.shopna.presentation.view.home.MainScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -32,28 +26,36 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
     val user: StateFlow<GetUserResponse?> get() = _user
 
     private val api = RetrofitInstance.apiClient
+    val homeViewModel = HomeViewModel()
 
     init {
         val languageCode = Locale.getDefault().language
         RetrofitInstance.setLanguage(languageCode)
     }
 
-    var isLoading by mutableStateOf(false)
-
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
 
     fun register(registerRequest: RegisterRequest) {
         viewModelScope.launch {
-            isLoading = true
+            _isLoading.value = true
             try {
                 val response = api.register(registerRequest)
-                if (response.isSuccessful&&response.body()?.status==true) {
+                if (response.isSuccessful && response.body()?.status == true) {
                     _userRegisterResponse.value = response.body()
                     _userRegisterResponse.value?.let {
                         RetrofitInstance.setAuthToken(it.data.token)
                     }
+                    saveAuthToken(context, _userLoginResponse.value?.data?.token.toString())
+
                     if (getUser()) {
-                        println("User registered successfully: ${_user.value}")
-                        navigator.push(HomeScreen(MainViewModel()))
+                        homeViewModel.getHomeData().let {
+                            homeViewModel.getCategories().let {
+                                navigator.push(MainScreen(homeViewModel))
+                                _isLoading.value = false
+
+                            }
+                        }
                     }
                 } else {
                     Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
@@ -61,22 +63,31 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
             } catch (e: Exception) {
                 Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
-                isLoading = false
+                _isLoading.value = false
             }
         }
     }
 
     fun login(loginRequest: LoginRequest) {
         viewModelScope.launch {
-            isLoading = true
+            _isLoading.value = true
             try {
                 val response = api.login(loginRequest)
-                if (response.isSuccessful&&response.body()?.status==true) {
+                if (response.isSuccessful && response.body()?.status == true) {
                     _userLoginResponse.value = response.body()
-                    _userLoginResponse.value?.let { RetrofitInstance.setAuthToken(it.data.token) }
+                    _userLoginResponse.value?.let {
+                        RetrofitInstance.setAuthToken(it.data.token)
+                    }
+                    saveAuthToken(context, _userLoginResponse.value?.data?.token.toString())
+
                     if (getUser()) {
-                        println("==========================================================${_user.value}")
-                      navigator.push(HomeScreen(MainViewModel()))
+                       homeViewModel.getHomeData().let {
+                           homeViewModel.getCategories().let {
+                               navigator.push(MainScreen(homeViewModel))
+                               _isLoading.value = false
+
+                           }
+                       }
                     }
                 } else {
                     Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
@@ -84,7 +95,6 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
             } catch (e: Exception) {
                 Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
             } finally {
-                isLoading = false
             }
         }
     }
@@ -92,16 +102,47 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
     private suspend fun getUser(): Boolean {
         return try {
             val response = api.getUser()
+            Log.d("AuthViewModel", "Get User Response: ${response.body()}")
             if (response.isSuccessful) {
                 _user.value = response.body()
                 true
             } else {
+                Log.e("AuthViewModel", "Error: ${response.code()} - ${response.message()}")
                 Toast.makeText(context, "Failed to retrieve user", Toast.LENGTH_SHORT).show()
                 false
             }
         } catch (e: Exception) {
+            Log.e("AuthViewModel", "Error: ${e.message}", e)
             Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             false
         }
+    }
+
+//    private suspend fun getHomeData(): Boolean {
+//        return try {
+//            _isLoading.value = true
+//            homeViewModel.getHomeData() // Ensure this is a suspend function
+//            homeViewModel.getCategories()
+//
+//            if (homeViewModel.products.value != null && homeViewModel.categories.value != null) {
+//                Log.d("AuthViewModel", "Home data loaded successfully")
+//                true
+//
+//            } else {
+//                Log.e("AuthViewModel", "Home data not loaded")
+//                false
+//            }
+//        } catch (e: Exception) {
+//            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+//            false
+//        } finally {
+//        }
+//    }
+
+    private fun saveAuthToken(context: Context, token: String) {
+        val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("token", token)
+        editor.apply()
     }
 }

@@ -38,10 +38,20 @@
     <string name="phone_number_digits_error">يجب أن يحتوي رقم الهاتف على أرقام فقط</string>
     <string name="phone_number_length_error">يجب أن يتكون رقم الهاتف من 10 أرقام على الأقل</string>
     <string name="create_account_button">إنشاء حساب</string>
-    <string name="signing_up">جارٍ التسجيل</string>
+    <string name="signing_up">تسجيل الدخول</string>
     <string name="no_account_yet">لا تملك حسابًا بعد؟</string>
     <string name="username">اسم المستخدم</string>
     <string name="phone_number">رقم الهاتف</string>
+    <string name="new_collection" translatable="false">مجموعة جديدة</string>
+    <string name="discount_offer" translatable="false">خصم 50٪ على أول عملية</string>
+    <string name="shop_now" translatable="false">تسوق الآن</string>
+    <string name="categories" translatable="false">الفئات</string>
+    <string name="recommendations" translatable="false">التوصيات</string>
+    <string name="see_all" translatable="false">عرض الكل</string>
+    <string name="add_to_cart" translatable="false">أضف إلى السلة</string>
+    <string name="favorite" translatable="false">المفضلة</string>
+    <string name="percent_off" translatable="false"> % خصم </string>
+    <string name="currency_egp" translatable="false">جنيه</string>
 
 
 </resources>

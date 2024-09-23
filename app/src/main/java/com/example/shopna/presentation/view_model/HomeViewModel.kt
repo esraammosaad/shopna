@@ -1,6 +1,10 @@
 package com.example.shopna.presentation.view_model
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shopna.data.model.Categories
@@ -15,7 +19,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 
-class MainViewModel : ViewModel() {
+class HomeViewModel() : ViewModel() {
     private val _homeData = MutableStateFlow<Home?>(null)
     val products: StateFlow<Home?> get() = _homeData
 
@@ -28,7 +32,7 @@ class MainViewModel : ViewModel() {
 
 
     private val _addFavorite = MutableStateFlow<Favorite?>(null)
-    val addPost : StateFlow<Favorite?> get() = _addFavorite
+    val addFavorite : StateFlow<Favorite?> get() = _addFavorite
 
 
 
@@ -36,49 +40,59 @@ class MainViewModel : ViewModel() {
     val favoritesList: StateFlow<List<FavoriteProducts>> get() = _favoritesList
 
     private val api = RetrofitInstance.apiClient
+    var isLoading by mutableStateOf(false)
 
     init {
 
         val languageCode = Locale.getDefault().language
         RetrofitInstance.setLanguage(languageCode)
 
-
-        getHomeData()
-        getCategories()
-        fetchFavorites()
     }
 
 
 
     fun getHomeData() {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = api.getHomeData()
                 if (response.isSuccessful) {
                     _homeData.value = response.body()
+                    println("products data: ===============================================================$products")
+
+
                 } else {
 
                     println("Error: ${response.errorBody()}")
                 }
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
+            }finally {
+                isLoading = false
+
             }
         }
     }
 
     fun getCategories() {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = api.getCategories()
                 if (response.isSuccessful) {
                     _categories.value = response.body()
                     println("Categories data: ${response.body()}")
+                    println("Categories data:=================================================== $categories")
+
                 } else {
                     println("Error: ${response.errorBody()?.string()}")
 
                 }
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
+            }finally {
+                isLoading = false
+
             }
         }
     }
@@ -88,7 +102,7 @@ class MainViewModel : ViewModel() {
                 val response = api.addToFavorites(addFavoriteRequest)
                 if (response.isSuccessful) {
                     Log.d("Favorites", "Product added to favorites")
-                    _favoritesList.value = _favoritesList.value + product
+                    _favoritesList.value += product
                     //fetchFavorites()
                 } else {
                     Log.e("Favorites", "Failed to add product to favorites")
@@ -101,7 +115,7 @@ class MainViewModel : ViewModel() {
 
 
 
-    fun fetchFavorites(): StateFlow<List<FavoriteProducts>> {
+    private fun fetchFavorites(): StateFlow<List<FavoriteProducts>> {
         return favoritesList
     }
 

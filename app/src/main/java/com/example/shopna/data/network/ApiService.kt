@@ -20,6 +20,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import java.util.concurrent.TimeUnit
 
 interface ApiService{
 
@@ -55,8 +56,10 @@ object RetrofitInstance {
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    val authInterceptor= AuthInterceptor()
-    private val okHttpClient = OkHttpClient.Builder()
+    private val authInterceptor= AuthInterceptor()
+    private val okHttpClient = OkHttpClient.Builder() .connectTimeout(30, TimeUnit.SECONDS) // Increase connection timeout
+        .readTimeout(30, TimeUnit.SECONDS) // Increase read timeout
+        .writeTimeout(30, TimeUnit.SECONDS) // Increase write timeout
         .addInterceptor(loggingInterceptor)
         .addInterceptor(authInterceptor)
         .build()
