@@ -15,6 +15,7 @@ import com.example.shopna.data.model.RegisterRequest
 import com.example.shopna.data.model.RegisterResponse
 import com.example.shopna.data.network.RetrofitInstance
 import com.example.shopna.presentation.view.home.HomeScreen
+import com.example.shopna.presentation.view.home.MainScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
