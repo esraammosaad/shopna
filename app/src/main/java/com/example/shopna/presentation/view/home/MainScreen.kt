@@ -1,180 +1,156 @@
 package com.example.shopna.presentation.view.home
 
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.example.shopna.ui.theme.kPrimaryColor
+import com.example.shopna.ui.theme.lightGreyColor
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.example.shopna.presentation.view_model.MainViewModel
+import com.example.shopna.R
+import com.example.shopna.presentation.view_model.AuthViewModel
+import com.example.shopna.presentation.view_model.HomeViewModel
+import com.example.shopna.ui.theme.backgroundColor
 
 
-class MainScreen(val mainViewModel: MainViewModel):Screen {
+class MainScreen(val mainViewModel: HomeViewModel) :Screen {
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator= LocalNavigator.currentOrThrow
+        val context= LocalContext.current
+        var selectedIndex by remember {mutableIntStateOf(0)}
         Scaffold(
-            topBar = { TopBar() },
-            bottomBar = { BottomNavigationBar(mainViewModel) }
-        ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(it)) {
-                //SearchBar()
+            containerColor = backgroundColor,
+            content ={
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)) {
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    if(selectedIndex==0){
+                        return@Column HomeScreen(viewModel = mainViewModel)
+                    }else if(selectedIndex==1){
 
-                ) {
-                    //HomeScreen(mainViewModel)
-                    NavigatorContent(mainViewModel)
+                        return@Column FavoriteScreen(mainViewModel)
+                    }else if(selectedIndex==2){
+
+                        return@Column CartScreen()
+                    }else if(selectedIndex==3){
+
+                        return@Column ProfileScreen()
+                    }
+
+
+
+
 
                 }
+            } ,
+            bottomBar = {  NavigationBar(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                    .wrapContentHeight(),
+                containerColor = Color.White,
 
-            }
-        }
+                ) { 
+                NavigationBarItem(
+                    colors = NavigationBarItemDefaults.colors(
+                        unselectedIconColor = lightGreyColor,
+                        selectedIconColor = Color.White,
+                        indicatorColor = Color.White,
+
+
+                    ),
+
+                    label = {
+                        if(selectedIndex==0) HorizontalDivider(color = kPrimaryColor, thickness = 4.dp, modifier = Modifier.width(30.dp))
+                    },
+
+
+                    selected =false ,
+                    onClick = { selectedIndex=0
+                        println("Categories data:=================================================== ${mainViewModel.categories.value}")
+
+
+
+                    },
+                    icon = {
+                        Image(painter = painterResource(id = R.drawable.homebutton), contentDescription ="" )
+                    }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    label = {
+                        if(selectedIndex==1) HorizontalDivider(color = kPrimaryColor, thickness = 4.dp, modifier = Modifier.width(30.dp))
+                    },
+                    onClick = {
+                        selectedIndex=1
+
+
+                              },
+                    icon = {
+
+                            Image(painter = painterResource(id = R.drawable.heart), contentDescription ="" )
+
+                    }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { selectedIndex=2},
+                    label = {
+                        if(selectedIndex==2) HorizontalDivider(color = kPrimaryColor, thickness = 4.dp, modifier = Modifier.width(30.dp))
+                    },
+                    icon = {
+
+                        Image(painter = painterResource(id = R.drawable.trolley), contentDescription ="" )
+
+                    }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { selectedIndex=3 },
+                    label = {
+                        if(selectedIndex==3) HorizontalDivider(color = kPrimaryColor, thickness = 4.dp, modifier = Modifier.width(30.dp))
+                    },
+                    icon = {
+
+                        Image(painter = painterResource(id = R.drawable.user), contentDescription ="" )
+
+                    }
+                )
+            } }
+            
+        ) 
 
 
     }
 }
 
-@Composable
-fun NavigatorContent(mainViewModel: MainViewModel) {
-    val navigator = LocalNavigator.currentOrThrow
-    navigator.push(MainScreen(mainViewModel))
-
-    when (navigator.lastItem) {
-        is FavoriteScreen -> FavoriteScreen(mainViewModel)
-        is MainScreen -> HomeScreen(mainViewModel)
-
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar() {
-    TopAppBar(
-        title = { Text(text = "", color = Color.Black) },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White),
-        navigationIcon = {
-            IconButton(onClick = { /* TODO: Implement menu click */ }) {
-                Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.Gray)
-            }
-        },
-        actions = {
-            IconButton(onClick = { /* TODO: Implement notification click */ }) {
-                Icon(
-                    Icons.Outlined.Notifications,
-                    contentDescription = "Notifications",
-                    tint = Color.Gray
-                )
-            }
-        }
-    )
-}
-/*
-@Composable
-fun SearchBar() {
-    var text = remember { mutableStateOf("") }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .background(Color(0xFFF0F0F0), shape = MaterialTheme.shapes.medium)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Search, contentDescription = "Search Icon", tint = Color.Gray)
-            Spacer(modifier = Modifier.width(8.dp))
-            BasicTextField(
-                value = text.value,
-                onValueChange = {  newvalue->
-                           text.value=newvalue     },
-                modifier = Modifier.fillMaxWidth(),
-                textStyle = TextStyle(fontSize = 18.sp, color = Color.Black)
-            )
-        }
-    }
-}
-
-*/
 
 
-@Composable
-fun BottomNavigationBar(mainViewModel: MainViewModel) {
-    val navigator = LocalNavigator.currentOrThrow
-    NavigationBar(
-        containerColor = Color.White,
-        contentColor = Color.Black
-    ) {
-        NavigationBarItem(
-            selected = navigator.lastItem is MainScreen,
-            onClick = { navigator.push(MainScreen(mainViewModel)) },
-            icon = {
-                Icon(
-                    Icons.Outlined.Home,
-                    contentDescription = "Home",
-                    tint = Color.Gray
-                )
-            }
-        )
-        NavigationBarItem(
-            selected = navigator.lastItem is FavoriteScreen,
-            onClick = { navigator.push(FavoriteScreen(mainViewModel)) },
-            icon = {
-                Icon(
-                    Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = if (navigator.lastItem is FavoriteScreen) Color.Magenta else Color.Gray
-                )
-            }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { /* TODO: Implement cart click */ },
-            icon = {
-                Icon(
-                    Icons.Outlined.ShoppingCart,
-                    contentDescription = "Cart",
-                    tint = Color.Gray
-                )
-            }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { /* TODO: Implement profile click */ },
-            icon = {
-                Icon(
-                    Icons.Outlined.Person,
-                    contentDescription = "Profile",
-                    tint = Color.Gray
-                )
-            }
-        )
-    }
-}
+
+
+
+
+
+
+

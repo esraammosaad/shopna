@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -55,11 +58,12 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.shopna.OnBoardingData
 import com.example.shopna.R
 import com.example.shopna.presentation.view.authentication.LoginScreen
+import com.example.shopna.presentation.view_model.AuthViewModel
 import com.example.shopna.ui.theme.backgroundColor
 import com.example.shopna.ui.theme.kPrimaryColor
 import kotlinx.coroutines.launch
 
-class OnBoardingScreen : Screen{
+class OnBoardingScreen() : Screen{
     @Composable
     override fun Content() {
         Surface (modifier = Modifier.fillMaxSize(), color = backgroundColor){
@@ -98,7 +102,7 @@ class OnBoardingScreen : Screen{
             OnBoardingPager(
                 item=items,
                 pagerState=pagerState,
-                modifier= Modifier.fillMaxSize()
+                modifier= Modifier.fillMaxSize(),
             )
 
 
@@ -111,7 +115,7 @@ class OnBoardingScreen : Screen{
 }
 
 @Composable
-fun PageIndicator(items:List<OnBoardingData>,currentPage:Int){
+fun <T> PageIndicator(items:List<T>,currentPage:Int,color:Color?=null){
     Row {
         repeat(items.size){
             val width= animateDpAsState(targetValue =if( it==currentPage) 25.dp else 8.dp,
@@ -123,7 +127,9 @@ fun PageIndicator(items:List<OnBoardingData>,currentPage:Int){
                 .height(5.dp)
                 .width(width.value)
                 .clip(CircleShape)
-                .background(if (it == currentPage) Color.White.copy(alpha = 0.7f) else Color.Gray))
+                .background(
+                    if (it == currentPage) color ?: Color.White.copy(alpha = 0.7f) else Color.Gray
+                ))
             {
 
             }
@@ -137,7 +143,7 @@ fun PageIndicator(items:List<OnBoardingData>,currentPage:Int){
 fun OnBoardingPager(
     item: List<OnBoardingData>,
     pagerState: PagerState,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val navigator= LocalNavigator.currentOrThrow
@@ -170,115 +176,121 @@ fun OnBoardingPager(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(270.dp),
+                            .fillMaxHeight(),
                         colors = CardDefaults.cardColors(containerColor = kPrimaryColor),
                         shape = RoundedCornerShape(topStart = 80.dp)
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Spacer(modifier = Modifier.height(24.dp))
+                      LazyColumn {
+                          item{
+                              Column(
+                                  modifier = Modifier
+                                      .fillMaxSize()
+                                      .padding(8.dp),
+                                  horizontalAlignment = Alignment.CenterHorizontally,
+                                  verticalArrangement = Arrangement.Center
+                              ) {
+                                  Spacer(modifier = Modifier.height(24.dp))
 
-                            Text(
-                                text = item[page].title,
-                                fontFamily = FontFamily.SansSerif,
-                                color = backgroundColor,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = item[page].description,
-                                modifier = Modifier.align(alignment = Alignment.CenterHorizontally),
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Light,
-                                fontFamily = FontFamily.SansSerif,
-                                color = Color(0xffe0e0e0),
-                                fontSize = 12.sp
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
+                                  Text(
+                                      text = item[page].title,
+                                      fontFamily = FontFamily.SansSerif,
+                                      color = backgroundColor,
+                                      fontSize = 20.sp,
+                                      fontWeight = FontWeight.Bold
+                                  )
+                                  Spacer(modifier = Modifier.height(10.dp))
+                                  Text(
+                                      text = item[page].description,
+                                      modifier = Modifier
+                                          .align(alignment = Alignment.CenterHorizontally)
+                                          .padding(),
+                                      textAlign = TextAlign.Center,
+                                      fontWeight = FontWeight.Light,
+                                      fontFamily = FontFamily.SansSerif,
+                                      color = Color(0xffe0e0e0),
+                                      fontSize = 14.sp
+                                  )
+                                  Spacer(modifier = Modifier.height(20.dp))
 
-                            PageIndicator(items = item, currentPage = pagerState.currentPage)
+                                  PageIndicator(items = item, currentPage = pagerState.currentPage)
 
-                            Spacer(modifier = Modifier.height(20.dp))
+                                  Spacer(modifier = Modifier.height(20.dp))
 
-                            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp)) {
-                                TextButton(onClick = {
-                                    navigator.push(LoginScreen())
-                                }){
-                                    Text(text = stringResource(id = R.string.skip), style = TextStyle(
-                                        color = Color.White,
-                                        fontFamily = FontFamily.Monospace,
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    )
+                                  Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
+                                      .fillMaxWidth()
+                                      .padding(horizontal = 8.dp)) {
+                                      TextButton(onClick = {
+                                          navigator.push(LoginScreen())
+                                      }){
+                                          Text(text = stringResource(id = R.string.skip), style = TextStyle(
+                                              color = Color.White,
+                                              fontFamily = FontFamily.Monospace,
+                                              fontSize = 15.sp,
+                                              fontWeight = FontWeight.Medium
+                                          )
+                                          )
 
-                                }
-                                Box{
+                                      }
+                                      Box{
 
-                                    OutlinedButton(onClick = {
-                                        coroutineScope.launch {
-                                            if(pagerState.currentPage==item.size-1){
-                                                navigator.push(LoginScreen())
+                                          OutlinedButton(onClick = {
+                                              coroutineScope.launch {
+                                                  if(pagerState.currentPage==item.size-1){
+                                                      navigator.push(LoginScreen())
 
-                                            }
-                                            else{
-                                                pagerState.animateScrollToPage(page = pagerState.currentPage +1)
+                                                  }
+                                                  else{
+                                                      pagerState.animateScrollToPage(page = pagerState.currentPage +1)
 
-                                            }
-                                        }
-                                    } ,
-                                        border = BorderStroke(
-                                            1.dp,
-                                            Color.White.copy(alpha = 0.6f)
-                                        ),
-                                        shape = RoundedCornerShape(if(pagerState.currentPage==item.size-1) 45 else 60),
-                                        colors = ButtonDefaults.outlinedButtonColors(
+                                                  }
+                                              }
+                                          } ,
+                                              border = BorderStroke(
+                                                  1.dp,
+                                                  Color.White.copy(alpha = 0.6f)
+                                              ),
+                                              shape = RoundedCornerShape(if(pagerState.currentPage==item.size-1) 45 else 60),
+                                              colors = ButtonDefaults.outlinedButtonColors(
 
-                                            contentColor = kPrimaryColor
-                                        ),
-                                        modifier =  if(pagerState.currentPage==item.size-1) Modifier.width(100.dp)else Modifier.size(38.dp)
-
-
-                                    )  {
-
-
-                                    }
-
-                                    if(pagerState.currentPage==item.size-1){
-                                        Text(text = stringResource(id = R.string.getStarted), modifier = Modifier.align(Alignment.Center), fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Medium, fontFamily = FontFamily.Serif)
+                                                  contentColor = kPrimaryColor
+                                              ),
+                                              modifier =  if(pagerState.currentPage==item.size-1) Modifier.width(100.dp)else Modifier.size(38.dp)
 
 
-
-                                    }
-                                      else{
-                                        Icon(
-                                            imageVector = Icons.Filled.ArrowForward ,
-                                            contentDescription ="next icon",
-                                            tint = Color.White.copy(alpha = 0.6f),
-                                            modifier = Modifier
-                                                .size(20.dp)
-                                                .align(Alignment.Center)
+                                          )  {
 
 
-                                        )
+                                          }
 
-                                                }
-
-
-                                }
-                            }
+                                          if(pagerState.currentPage==item.size-1){
+                                              Text(text = stringResource(id = R.string.getStarted), modifier = Modifier.align(Alignment.Center), fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Medium, fontFamily = FontFamily.Serif)
 
 
 
-                        }
+                                          }
+                                          else{
+                                              Icon(
+                                                  imageVector = Icons.Filled.ArrowForward ,
+                                                  contentDescription ="next icon",
+                                                  tint = Color.White.copy(alpha = 0.6f),
+                                                  modifier = Modifier
+                                                      .size(20.dp)
+                                                      .align(Alignment.Center)
+
+
+                                              )
+
+                                          }
+
+
+                                      }
+                                  }
+
+
+
+                              }
+                          }
+                      }
                     }
 
                 }

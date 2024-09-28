@@ -46,6 +46,16 @@
     <string name="no_account_yet">Don\'t have an account yet?</string>
     <string name="username">Username</string>
     <string name="phone_number">Phone Number</string>
+    <string name="new_collection">New Collection</string>
+    <string name="discount_offer">Discount 50% for\nthe first transaction</string>
+    <string name="shop_now">Shop Now</string>
+    <string name="categories">Categories</string>
+    <string name="recommendations">Recommendations</string>
+    <string name="see_all">See All</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="favorite">Favorite</string>
+    <string name="percent_off">% OFF</string>
+    <string name="currency_egp">EGP</string>
 
 
 

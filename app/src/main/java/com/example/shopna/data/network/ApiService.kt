@@ -7,6 +7,7 @@ import com.example.shopna.data.model.GetUserResponse
 import com.example.shopna.data.model.Home
 import com.example.shopna.data.model.LoginRequest
 import com.example.shopna.data.model.LoginResponse
+import com.example.shopna.data.model.Products
 import com.example.shopna.data.model.RegisterRequest
 import com.example.shopna.data.model.RegisterResponse
 import com.example.shopna.interceptor.AuthInterceptor
@@ -20,6 +21,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import java.util.concurrent.TimeUnit
 
 interface ApiService{
 
@@ -38,6 +40,8 @@ interface ApiService{
     @GET("categories")
     suspend fun getCategories():Response<Categories>
 
+    @GET("categories/{id}")
+    suspend fun getProductsByCategory(@Path("id") categoryId: Int): Response<Categories>
 
     @GET("favorites")
     suspend fun getFavorite():Response<Favorite>
@@ -49,14 +53,19 @@ interface ApiService{
     @DELETE("favorites/{id}")
     suspend fun removeFromFavorites(@Path("id") productId: Int): Response<Unit>
 
+
+
+
 }
 
 object RetrofitInstance {
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    val authInterceptor= AuthInterceptor()
-    private val okHttpClient = OkHttpClient.Builder()
+    private val authInterceptor= AuthInterceptor()
+    private val okHttpClient = OkHttpClient.Builder() .connectTimeout(30, TimeUnit.SECONDS) // Increase connection timeout
+        .readTimeout(30, TimeUnit.SECONDS) // Increase read timeout
+        .writeTimeout(30, TimeUnit.SECONDS) // Increase write timeout
         .addInterceptor(loggingInterceptor)
         .addInterceptor(authInterceptor)
         .build()

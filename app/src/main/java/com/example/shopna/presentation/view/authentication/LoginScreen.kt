@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,15 +58,19 @@ import com.example.shopna.ui.theme.kPrimaryColor
 import com.example.shopna.ui.theme.lightGreyColor
 import com.example.shopna.ui.theme.lighterGreyColor
 
-class LoginScreen : Screen{
+class LoginScreen() : Screen{
+
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
 
+
         val viewModel = remember {
             AuthViewModel(navigator, context)
         }
+
         val email = remember { mutableStateOf("") }
         val password = remember { mutableStateOf("") }
 
@@ -122,7 +127,7 @@ class LoginScreen : Screen{
                     CustomForgetPasswordRow()
                     Spacer(Modifier.height(20.dp))
 
-                    if (viewModel.isLoading) {
+                    if (viewModel.isLoading.collectAsState().value) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -247,7 +252,8 @@ fun CustomDivider(text :String){
     Row (modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 8.dp),horizontalArrangement = Arrangement.Center,verticalAlignment = Alignment.CenterVertically){
-        HorizontalDivider(color = Color(0xffE0E0E0), modifier = Modifier.width(LocalConfiguration.current.screenHeightDp.dp/6))
+        HorizontalDivider(color = Color(0xffE0E0E0),
+            modifier = Modifier.width(LocalConfiguration.current.screenHeightDp.dp/6))
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = stringResource(id = R.string.or_with,text),
@@ -259,7 +265,8 @@ fun CustomDivider(text :String){
 
         )
         Spacer(modifier = Modifier.width(4.dp))
-        HorizontalDivider(color = Color(0xffE0E0E0), modifier = Modifier.width(LocalConfiguration.current.screenHeightDp.dp/6))
+        HorizontalDivider(color = Color(0xffE0E0E0),
+            modifier = Modifier.width(LocalConfiguration.current.screenHeightDp.dp/6))
 
     }
 }
