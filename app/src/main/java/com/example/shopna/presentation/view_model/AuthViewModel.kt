@@ -1,5 +1,6 @@
 package com.example.shopna.presentation.view_model
 
+import android.app.Activity.MODE_PRIVATE
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -33,8 +34,17 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
 
 
     init {
+        if(getAuthToken()!=null){
+            getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
+        homeViewModel.getHomeData()
+        homeViewModel.getCategories()}
         val languageCode = Locale.getDefault().language
         RetrofitInstance.setLanguage(languageCode)
+    }
+
+     fun getAuthToken(): String? {
+        val sharedPreferences = context.getSharedPreferences("app_prefs", MODE_PRIVATE)
+        return sharedPreferences.getString("token", null)
     }
 
     private val _isLoading = MutableStateFlow(false)

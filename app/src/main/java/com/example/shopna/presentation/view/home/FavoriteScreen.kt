@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,15 +41,16 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import coil.compose.AsyncImage
 import com.example.shopna.R
-import com.example.shopna.data.model.FavoriteProducts
+import com.example.shopna.data.model.DataXXXXX
+import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.backgroundColor
 import com.example.shopna.ui.theme.kPrimaryColor
 
 @Composable
-fun FavoriteScreen(mainViewModel: HomeViewModel){
-    val favorites = mainViewModel.favoritesList.collectAsState()
-        // val favorites by mainViewModel.fetchFavorites().collectAsState(initial = emptyList())
+fun FavoriteScreen(favoriteViewModel: FavoriteViewModel){
+         favoriteViewModel.fetchFavorites()
+         val favoriteProducts by favoriteViewModel.favoriteData.collectAsState()
         Column {
 
                 Text(text = "Favorite", modifier = Modifier.padding(start = 12.dp, top = 15.dp)
@@ -62,87 +64,82 @@ fun FavoriteScreen(mainViewModel: HomeViewModel){
 
                 ) {
 
-                    items(favorites.value) { favoriteProduct ->
-                        FavoriteItem(favoriteProduct,mainViewModel)
+                    favoriteProducts?.data?.data?.let {
+                        items(it) { favoriteProduct ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                                    .shadow(4.dp, RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(8.dp)),
+                                colors = CardDefaults.cardColors(containerColor = Color.White)
+
+
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+
+                                    AsyncImage(
+                                        model = favoriteProduct.product.image,
+                                        contentDescription = favoriteProduct.product.description,
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(Color.Gray)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(16.dp))
+
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        val productName = favoriteProduct.product.name ?: ""
+                                        val words = productName.split(" ")
+                                        Text(
+                                            text = if (words.size > 6) words.take(4).joinToString(" ") + "..." else productName,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            style = TextStyle(
+                                                fontSize = 15.sp,
+                                                fontFamily = FontFamily(Font(R.font.interregular)),
+                                                fontWeight = FontWeight.Bold,
+                                            ),
+                                        )
+                                        Spacer(modifier = Modifier.height(5.dp))
+                                        Text(
+                                            text = "$${favoriteProduct.product.price} EGP",
+                                            style = TextStyle(
+                                                color = kPrimaryColor,
+                                                fontSize = 10.sp,
+                                                fontFamily = FontFamily(Font(R.font.interregular)),
+                                                fontWeight = FontWeight.W400,
+                                            ),
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(20.dp))
+                                    IconButton(onClick = {
+
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Delete,
+                                            contentDescription = "Remove from favorites",
+                                            tint = kPrimaryColor
+
+                                        )
+                                    }
+
+                                }
+
+
+                            }
                     }
 
                 }
 
 
-        }
-
+        }}
 }
-@Composable
-fun FavoriteItem(favoriteProduct: FavoriteProducts, mainViewModel: HomeViewModel) {
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .shadow(4.dp, RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
 
 
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            AsyncImage(
-                model = favoriteProduct.image,
-                contentDescription = favoriteProduct.name,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                val productName = favoriteProduct.name ?: ""
-                val words = productName.split(" ")
-                Text(
-                    text = if (words.size > 6) words.take(4).joinToString(" ") + "..." else productName,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontFamily = FontFamily(Font(R.font.interregular)),
-                        fontWeight = FontWeight.Bold,
-                    ),
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                text = "$${favoriteProduct.price} EGP",
-                style = TextStyle(
-                    color = kPrimaryColor,
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily(Font(R.font.interregular)),
-                    fontWeight = FontWeight.W400,
-                ),
-            )
-            }
-            Spacer(modifier = Modifier.width(20.dp))
-            IconButton(onClick = {
-                favoriteProduct.id?.let { id ->
-                    mainViewModel.removeFavorite(id)
-                }
-            }) {
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = "Remove from favorites",
-                    tint = kPrimaryColor
-
-                )
-            }
-
-        }
-
-
-    }
-}

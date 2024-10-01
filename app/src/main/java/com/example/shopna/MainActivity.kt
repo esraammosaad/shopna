@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
 
                   // if(getAuthToken()==null) Navigator(OnBoardingScreen()) else Navigator(MainScreen(HomeViewModel()))
 
-                Navigator(OnBoardingScreen())
+               if(isOnBoardingShown()) Navigator(LoginScreen(this))else Navigator(OnBoardingScreen())
 
 
 
@@ -39,10 +39,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun getAuthToken(): String? {
-        val sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        return sharedPreferences.getString("token", null)
-    }
+
 
 
 

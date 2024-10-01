@@ -46,23 +46,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.shopna.data.model.Banners
 import com.example.shopna.data.model.DataCategories
-import com.example.shopna.data.model.FavoriteProducts
-import com.example.shopna.data.model.FavoriteRequest
 import com.example.shopna.data.model.Products
 import com.example.shopna.presentation.view_model.HomeViewModel
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -72,16 +68,17 @@ import androidx.compose.ui.text.style.TextAlign
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
+import com.example.shopna.presentation.view_model.AuthViewModel
+import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.ui.theme.greyColor
 import com.example.shopna.ui.theme.kPrimaryColor
 import com.example.shopna.ui.theme.lightGreyColor
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
-    val homeData by viewModel.products.collectAsState()
-    val categories by viewModel.categories.collectAsState()
+fun HomeScreen(homeViewModel: HomeViewModel,favoriteViewModel: FavoriteViewModel) {
+    val homeData by homeViewModel.products.collectAsState()
+    val categories by homeViewModel.categories.collectAsState()
+
 
 
     LazyColumn(
@@ -193,7 +190,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
             CustomText(text = stringResource(id = R.string.categories))
             Spacer(modifier = Modifier.height(4.dp))
-            if (viewModel.isLoading) {
+            if (homeViewModel.isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -216,7 +213,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            if (viewModel.products.collectAsState().value==null) {
+            if (homeViewModel.products.collectAsState().value==null) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -226,7 +223,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     CircularProgressIndicator(color = kPrimaryColor)
                 }
             }else{ homeData?.dataa?.products?.let { products ->
-                ProductGrid(products,viewModel)
+                ProductGrid(products, favoriteViewModel)
             }}
         }
     }
@@ -289,56 +286,7 @@ private fun CustomIcon(icon: Painter,onClick:()->Unit) {
 }
 
 
-@Composable
-fun AutoScrollingBannerSection(banners: List<Banners>) {
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    val bannerCount = banners.size
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            while (true) {
-                delay(2000L)
-
-                val nextIndex = (listState.firstVisibleItemIndex + 1) % bannerCount
-                listState.animateScrollToItem(nextIndex)
-            }
-        }
-    }
-
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(modifier = Modifier.height(36.dp))
-        LazyRow(
-            state = listState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(LocalConfiguration.current.screenHeightDp.dp / 3),
-        ) {
-            itemsIndexed(banners) { index, banner ->
-                val scale = if (index == listState.firstVisibleItemIndex) 1.2f else 1f
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .graphicsLayer(scaleX = scale, scaleY = scale)
-                ) {
-                    AsyncImage(
-                        model = banner.image,
-                        contentDescription = "Banner $index",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(12.dp))
-                    )
-                }
-            }
-        }
-
-        // PageIndicator(items = banners, currentPage = listState.firstVisibleItemIndex + 1, kPrimaryColor)
-    }
-}
 
 
 
@@ -352,6 +300,7 @@ fun CategorySection(categories: List<DataCategories>) {
         ,R.drawable.sports
         ,R.drawable.led
         ,R.drawable.clothes
+        ,R.drawable.img
     )
 
 
@@ -362,7 +311,8 @@ fun CategorySection(categories: List<DataCategories>) {
         ) {
            items(categories.size) { index ->
                 Column(
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
                         .clickable {
                             navigator.push(CategoryProductsScreen(categories[index].id ?: 0))
                         },
@@ -394,7 +344,7 @@ fun CategorySection(categories: List<DataCategories>) {
 }
 
 @Composable
-fun ProductGrid(products: List<Products>,viewModel:HomeViewModel) {
+fun ProductGrid(products: List<Products>,favoriteViewModel: FavoriteViewModel) {
     LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(8.dp),
@@ -403,7 +353,7 @@ fun ProductGrid(products: List<Products>,viewModel:HomeViewModel) {
                 .height(LocalConfiguration.current.screenHeightDp.dp / 2),
         ) {
             items(products) { product ->
-                ProductItem(product, viewModel )
+                ProductItem(product, favoriteViewModel )
             }
         }
 
@@ -412,8 +362,12 @@ fun ProductGrid(products: List<Products>,viewModel:HomeViewModel) {
 
 
 @Composable
-fun ProductItem(product: Products,viewModel: HomeViewModel) {
+fun ProductItem(product: Products,favoriteViewModel: FavoriteViewModel) {
     val navigator = LocalNavigator.currentOrThrow
+    val context=LocalContext.current
+    val favorite by favoriteViewModel.favorite.collectAsState()
+    var isFavorite by remember { mutableStateOf(product.inFavorites) }
+    var selectedIndex by remember { mutableStateOf(0) }
     Box(
         modifier = Modifier
             .padding(8.dp)
@@ -520,7 +474,6 @@ fun ProductItem(product: Products,viewModel: HomeViewModel) {
                 )
             }
         }
-        val isFavorite = viewModel.favoritesList.collectAsState().value.any { it.id == product.id }
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -528,28 +481,22 @@ fun ProductItem(product: Products,viewModel: HomeViewModel) {
                 .size(24.dp)
         ) {
             IconButton(
-                onClick = {val productId: Int? = product.id
-                    if (productId != null) {
-                        if (isFavorite) {
-                            viewModel.removeFavorite(productId)
-                        } else {
-                            val favoriteProduct = FavoriteProducts(
-                                id = product.id,
-                                price = product.price,
-                                oldPrice = product.oldPrice,
-                                discount = product.discount,
-                                image = product.image,
-                                name = product.name,
-                                description = product.description
-                            )
-                            viewModel.addFavorite(
-                                FavoriteRequest(productId = productId),
-                                favoriteProduct
-                            )}}  },
+                onClick = {
+                    favoriteViewModel.addOrDeleteFavorite(product.id!!)
+                    isFavorite=!isFavorite!!
+                    favoriteViewModel.fetchFavorites()
+                    product.inFavorites=isFavorite
+                    selectedIndex=product.id!!
+
+
+                },
                 modifier = Modifier.size(18.dp)
             ) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                if(favoriteViewModel.isLoading && selectedIndex==product.id)
+                    CircularProgressIndicator(
+                        color = kPrimaryColor,
+                        modifier = Modifier.size(13.dp)) else Icon(
+                    imageVector = if (isFavorite==true) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorite",
                     tint = kPrimaryColor.copy(alpha = 0.4f)
                 )
@@ -559,49 +506,102 @@ fun ProductItem(product: Products,viewModel: HomeViewModel) {
 
 
 }
+//
+//@Composable
+//fun FavoriteIcon(product: Products, viewModel: HomeViewModel) {
+//    val isFavorite = viewModel.favoritesList.collectAsState().value.any { it.id == product.id }
+//    Box(
+//        modifier = Modifier
+//            .size(40.dp)
+//            .background(
+//                color = Color(0xff6C2DC7),
+//                shape = RoundedCornerShape(
+//                    topEnd = 20.dp,
+//                    bottomStart = 10.dp
+//                )
+//            )
+//            .clickable {
+//                val productId: Int? = product.id
+//                if (productId != null) {
+//                    if (isFavorite) {
+//                        viewModel.removeFavorite(productId)
+//                    } else {
+//                        val favoriteProduct = FavoriteProducts(
+//                            id = product.id,
+//                            price = product.price,
+//                            oldPrice = product.oldPrice,
+//                            discount = product.discount,
+//                            image = product.image,
+//                            name = product.name,
+//                            description = product.description
+//                        )
+//                        viewModel.addFavorite(
+//                            FavoriteRequest(productId = productId),
+//                            favoriteProduct
+//                        )
+//                    }
+//                }
+//            },
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Icon(
+//            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+//            contentDescription = "Favorite Icon",
+//            tint = if (isFavorite) Color.White else Color.White,
+//            modifier = Modifier.size(22.dp)
+//        )
+//    }
+//}
 
-@Composable
-fun FavoriteIcon(product: Products, viewModel: HomeViewModel) {
-    val isFavorite = viewModel.favoritesList.collectAsState().value.any { it.id == product.id }
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .background(
-                color = Color(0xff6C2DC7),
-                shape = RoundedCornerShape(
-                    topEnd = 20.dp,
-                    bottomStart = 10.dp
-                )
-            )
-            .clickable {
-                val productId: Int? = product.id
-                if (productId != null) {
-                    if (isFavorite) {
-                        viewModel.removeFavorite(productId)
-                    } else {
-                        val favoriteProduct = FavoriteProducts(
-                            id = product.id,
-                            price = product.price,
-                            oldPrice = product.oldPrice,
-                            discount = product.discount,
-                            image = product.image,
-                            name = product.name,
-                            description = product.description
-                        )
-                        viewModel.addFavorite(
-                            FavoriteRequest(productId = productId),
-                            favoriteProduct
-                        )
-                    }
-                }
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-            contentDescription = "Favorite Icon",
-            tint = if (isFavorite) Color.White else Color.White,
-            modifier = Modifier.size(22.dp)
-        )
-    }
-}
+
+
+//@Composable
+//fun AutoScrollingBannerSection(banners: List<Banners>) {
+//    val listState = rememberLazyListState()
+//    val coroutineScope = rememberCoroutineScope()
+//    val bannerCount = banners.size
+//
+//    LaunchedEffect(Unit) {
+//        coroutineScope.launch {
+//            while (true) {
+//                delay(2000L)
+//
+//                val nextIndex = (listState.firstVisibleItemIndex + 1) % bannerCount
+//                listState.animateScrollToItem(nextIndex)
+//            }
+//        }
+//    }
+//
+//    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+//        Spacer(modifier = Modifier.height(36.dp))
+//        LazyRow(
+//            state = listState,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(LocalConfiguration.current.screenHeightDp.dp / 3),
+//        ) {
+//            itemsIndexed(banners) { index, banner ->
+//                val scale = if (index == listState.firstVisibleItemIndex) 1.2f else 1f
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(8.dp)
+//                        .clip(RoundedCornerShape(12.dp))
+//                        .graphicsLayer(scaleX = scale, scaleY = scale)
+//                ) {
+//                    AsyncImage(
+//                        model = banner.image,
+//                        contentDescription = "Banner $index",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .clip(RoundedCornerShape(12.dp))
+//                    )
+//                }
+//            }
+//        }
+//
+//        // PageIndicator(items = banners, currentPage = listState.firstVisibleItemIndex + 1, kPrimaryColor)
+//    }
+//}

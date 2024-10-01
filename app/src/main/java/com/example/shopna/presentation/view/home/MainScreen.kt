@@ -28,17 +28,20 @@ import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
-import com.example.shopna.presentation.view_model.AuthViewModel
+import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.backgroundColor
 
 
-class MainScreen(val mainViewModel: HomeViewModel) :Screen {
+class MainScreen(private val homeViewModel: HomeViewModel) :Screen {
     @Composable
     override fun Content() {
-        val navigator= LocalNavigator.currentOrThrow
+        val navigator=LocalNavigator.currentOrThrow
         val context= LocalContext.current
         var selectedIndex by remember {mutableIntStateOf(0)}
+        val favoriteViewModel: FavoriteViewModel = remember {
+            FavoriteViewModel(navigator,context)
+        }
         Scaffold(
             containerColor = backgroundColor,
             content ={
@@ -46,17 +49,22 @@ class MainScreen(val mainViewModel: HomeViewModel) :Screen {
                     .fillMaxSize()
                     .padding(it)) {
 
-                    if(selectedIndex==0){
-                        return@Column HomeScreen(viewModel = mainViewModel)
-                    }else if(selectedIndex==1){
+                    when (selectedIndex) {
+                        0 -> {
+                            return@Column HomeScreen(homeViewModel,favoriteViewModel)
+                        }
+                        1 -> {
 
-                        return@Column FavoriteScreen(mainViewModel)
-                    }else if(selectedIndex==2){
+                            return@Column FavoriteScreen(favoriteViewModel)
+                        }
+                        2 -> {
 
-                        return@Column CartScreen()
-                    }else if(selectedIndex==3){
+                            return@Column CartScreen()
+                        }
+                        3 -> {
 
-                        return@Column ProfileScreen()
+                            return@Column ProfileScreen()
+                        }
                     }
 
 
@@ -88,7 +96,7 @@ class MainScreen(val mainViewModel: HomeViewModel) :Screen {
 
                     selected =false ,
                     onClick = { selectedIndex=0
-                        println("Categories data:=================================================== ${mainViewModel.categories.value}")
+                        println("Categories data:=================================================== ${homeViewModel.categories.value}")
 
 
 

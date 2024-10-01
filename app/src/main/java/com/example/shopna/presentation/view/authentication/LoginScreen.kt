@@ -49,37 +49,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
 import com.example.shopna.data.model.LoginRequest
+import com.example.shopna.presentation.view.home.MainScreen
 import com.example.shopna.presentation.view_model.AuthViewModel
 import com.example.shopna.ui.theme.greyColor
 import com.example.shopna.ui.theme.kPrimaryColor
 import com.example.shopna.ui.theme.lightGreyColor
 import com.example.shopna.ui.theme.lighterGreyColor
 
-class LoginScreen() : Screen{
+
+
+class LoginScreen(private val context: Context) : Screen{
+
 
 
     @Composable
     override fun Content() {
+
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
 
 
-        val viewModel = remember {
+        val authViewModel = remember {
             AuthViewModel(navigator, context)
         }
 
         val email = remember { mutableStateOf("") }
         val password = remember { mutableStateOf("") }
-
         val emailError = remember { mutableStateOf(false) }
         val passwordError = remember { mutableStateOf(false) }
         val emailErrorMessage = remember { mutableStateOf("") }
         val passwordErrorMessage = remember { mutableStateOf("") }
 
-        LazyColumn {
+        if(authViewModel.getAuthToken()==null)  LazyColumn {
             item {
                 Column(
                     modifier = Modifier
@@ -127,7 +132,7 @@ class LoginScreen() : Screen{
                     CustomForgetPasswordRow()
                     Spacer(Modifier.height(20.dp))
 
-                    if (viewModel.isLoading.collectAsState().value) {
+                    if (authViewModel.isLoading.collectAsState().value) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -142,7 +147,7 @@ class LoginScreen() : Screen{
                             val isPasswordValid = validatePassword(context,password.value, passwordError, passwordErrorMessage)
 
                             if (isEmailValid && isPasswordValid) {
-                                viewModel.login(
+                                authViewModel.login(
                                     LoginRequest(
                                         email = email.value,
                                         password = password.value,
@@ -160,9 +165,13 @@ class LoginScreen() : Screen{
                     } )
                 }
             }
-        }
+        } else Navigator(MainScreen(authViewModel.homeViewModel))
+
     }
+
+
 }
+
 
 @Composable
 fun CustomTextSpan(textOne:String,  textTwo:String, onClick:()->Unit ){
@@ -363,7 +372,7 @@ fun CustomTextField(
 fun validateEmail(context: Context,email: String, errorState: MutableState<Boolean>, errorMessageState: MutableState<String>): Boolean {
     return if (email.isEmpty()) {
         errorState.value = true
-        errorMessageState.value = context.getString(R.string.password_length_error)
+        errorMessageState.value = context.getString(R.string.email_empty_error)
         false
     } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
         errorState.value = true
@@ -392,3 +401,5 @@ fun validatePassword(context: Context, password: String, errorState: MutableStat
         true
     }
 }
+
+

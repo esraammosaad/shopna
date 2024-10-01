@@ -33,6 +33,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
 import com.example.shopna.data.model.Products
+import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.kPrimaryColor
 
@@ -98,7 +99,7 @@ class CategoryProductsScreen(private val categoryId: Int) : Screen {
 
             if (products != null && products.isNotEmpty()) {
 
-                ProductGrid(products = products, viewModel)
+//                ProductGrid(products = products, FavoriteViewModel())
             } else {
                 Box(
                     modifier = Modifier.fillMaxSize(),

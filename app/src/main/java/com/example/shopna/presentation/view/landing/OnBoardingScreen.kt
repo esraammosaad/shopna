@@ -1,5 +1,6 @@
 package com.example.shopna.presentation.view.landing
 
+import android.content.Context
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -40,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -103,6 +106,7 @@ class OnBoardingScreen() : Screen{
                 item=items,
                 pagerState=pagerState,
                 modifier= Modifier.fillMaxSize(),
+                context = LocalContext.current
             )
 
 
@@ -144,6 +148,7 @@ fun OnBoardingPager(
     item: List<OnBoardingData>,
     pagerState: PagerState,
     modifier: Modifier,
+    context: Context
 ) {
     val coroutineScope = rememberCoroutineScope()
     val navigator= LocalNavigator.currentOrThrow
@@ -170,13 +175,13 @@ fun OnBoardingPager(
                     LottieAnimation(
                         composition = composition,
                         iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.size(240.dp)
+                        modifier = Modifier.size(LocalConfiguration.current.screenHeightDp.dp * 0.5f)
                     )
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(),
+                            .height(LocalConfiguration.current.screenHeightDp.dp * 0.5f),
                         colors = CardDefaults.cardColors(containerColor = kPrimaryColor),
                         shape = RoundedCornerShape(topStart = 80.dp)
                     ) {
@@ -220,7 +225,11 @@ fun OnBoardingPager(
                                       .fillMaxWidth()
                                       .padding(horizontal = 8.dp)) {
                                       TextButton(onClick = {
-                                          navigator.push(LoginScreen())
+                                          val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                          val editor = sharedPreferences.edit()
+                                          editor.putBoolean("on_boarding_shown", true)
+                                          editor.apply()
+                                          navigator.push(LoginScreen(context = context))
                                       }){
                                           Text(text = stringResource(id = R.string.skip), style = TextStyle(
                                               color = Color.White,
@@ -236,7 +245,12 @@ fun OnBoardingPager(
                                           OutlinedButton(onClick = {
                                               coroutineScope.launch {
                                                   if(pagerState.currentPage==item.size-1){
-                                                      navigator.push(LoginScreen())
+                                                      val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                                      val editor = sharedPreferences.edit()
+                                                      editor.putBoolean("on_boarding_shown", true)
+                                                      editor.apply()
+                                                      navigator.push(LoginScreen(context=context))
+
 
                                                   }
                                                   else{
@@ -263,7 +277,12 @@ fun OnBoardingPager(
                                           }
 
                                           if(pagerState.currentPage==item.size-1){
-                                              Text(text = stringResource(id = R.string.getStarted), modifier = Modifier.align(Alignment.Center), fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Medium, fontFamily = FontFamily.Serif)
+                                              Text(text = stringResource(id = R.string.getStarted),
+                                                  modifier = Modifier.align(Alignment.Center),
+                                                  fontSize = 12.sp,
+                                                  color = Color.White,
+                                                  fontWeight = FontWeight.Medium,
+                                                  fontFamily = FontFamily.Serif)
 
 
 
