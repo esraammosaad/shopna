@@ -26,14 +26,17 @@ import com.example.shopna.ui.theme.lightGreyColor
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
+import com.example.shopna.data.model.GetUserResponse
 import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.backgroundColor
+import kotlinx.coroutines.flow.StateFlow
 
 
-class MainScreen(private val homeViewModel: HomeViewModel) :Screen {
+class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<GetUserResponse?>) :Screen {
     @Composable
     override fun Content() {
         val navigator=LocalNavigator.currentOrThrow
@@ -51,11 +54,13 @@ class MainScreen(private val homeViewModel: HomeViewModel) :Screen {
 
                     when (selectedIndex) {
                         0 -> {
-                            return@Column HomeScreen(homeViewModel,favoriteViewModel)
+                        
+                           Navigator(screen = HomeScreen(homeViewModel,favoriteViewModel,user))
                         }
                         1 -> {
 
-                            return@Column FavoriteScreen(favoriteViewModel)
+
+                            return@Column FavoriteScreen(favoriteViewModel,homeViewModel)
                         }
                         2 -> {
 

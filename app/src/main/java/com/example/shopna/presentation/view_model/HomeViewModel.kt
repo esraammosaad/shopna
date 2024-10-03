@@ -1,12 +1,12 @@
 package com.example.shopna.presentation.view_model
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shopna.data.model.Categories
+import com.example.shopna.data.model.CategoryDetailsResponse
+import com.example.shopna.data.model.GetCategoryResponse
 import com.example.shopna.data.model.Home
 import com.example.shopna.data.network.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,16 +15,16 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 
-class HomeViewModel() : ViewModel() {
+class HomeViewModel : ViewModel() {
     private val _homeData = MutableStateFlow<Home?>(null)
     val products: StateFlow<Home?> get() = _homeData
 
 
-    private val _categories = MutableStateFlow<Categories?>(null)
-    val categories: StateFlow<Categories?> get() = _categories
+    private val _categories = MutableStateFlow<GetCategoryResponse?>(null)
+    val categories: StateFlow<GetCategoryResponse?> get() = _categories
 
-    private val _categoryProducts = MutableStateFlow<Categories?>(null)
-    val categoryProducts: StateFlow<Categories?> get() = _categoryProducts
+    private val _categoryProducts = MutableStateFlow<CategoryDetailsResponse?>(null)
+    val categoryProducts: StateFlow<CategoryDetailsResponse?> get() = _categoryProducts
 
 
 
@@ -69,12 +69,8 @@ class HomeViewModel() : ViewModel() {
                 val response = api.getCategories()
                 if (response.isSuccessful) {
                     _categories.value = response.body()
-                    println("Categories data: ${response.body()}")
-                    println("Categories data:=================================================== $categories")
-
                 } else {
                     println("Error: ${response.errorBody()?.string()}")
-
                 }
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
@@ -88,6 +84,7 @@ class HomeViewModel() : ViewModel() {
 
     fun getProductsByCategory(categoryId: Int) {
         viewModelScope.launch {
+            isLoading=true
             try {
                 val response = api.getProductsByCategory(categoryId)
                 if (response.isSuccessful && response.body() != null) {
@@ -100,9 +97,14 @@ class HomeViewModel() : ViewModel() {
             } catch (e: Exception) {
                 println("Exception: ${e.message}")
                 _categoryProducts.value = null
+            }finally {
+                isLoading=false
+
             }
         }
     }
+
+
 
 
 

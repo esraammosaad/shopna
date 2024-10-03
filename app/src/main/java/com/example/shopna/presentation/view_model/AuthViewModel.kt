@@ -9,16 +9,13 @@ import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.shopna.data.model.*
 import com.example.shopna.data.network.RetrofitInstance
-
-import com.example.shopna.presentation.view.home.HomeScreen
-
 import com.example.shopna.presentation.view.home.MainScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-class AuthViewModel(private val navigator: Navigator, val context: Context) : ViewModel() {
+class AuthViewModel(private val navigator: Navigator, private val context: Context) : ViewModel() {
 
     private val _userRegisterResponse = MutableStateFlow<RegisterResponse?>(null)
     val userRegisterResponse: StateFlow<RegisterResponse?> get() = _userRegisterResponse
@@ -36,11 +33,15 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
     init {
         if(getAuthToken()!=null){
             getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
+            getUser()
         homeViewModel.getHomeData()
-        homeViewModel.getCategories()}
+        homeViewModel.getCategories()
+        }
         val languageCode = Locale.getDefault().language
         RetrofitInstance.setLanguage(languageCode)
     }
+
+
 
      fun getAuthToken(): String? {
         val sharedPreferences = context.getSharedPreferences("app_prefs", MODE_PRIVATE)
@@ -61,16 +62,17 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
                         RetrofitInstance.setAuthToken(it.data.token)
                     }
                     saveAuthToken(context, _userLoginResponse.value?.data?.token.toString())
+                    getUser().let {
+                            homeViewModel.getHomeData().let {
+                                homeViewModel.getCategories().let {
+                                    navigator.push(MainScreen(homeViewModel,user))
+                                    _isLoading.value = false
 
-                    if (getUser()) {
-                        homeViewModel.getHomeData().let {
-                            homeViewModel.getCategories().let {
-                                navigator.push(MainScreen(homeViewModel))
-                                _isLoading.value = false
-
+                                }
                             }
-                        }
+
                     }
+
                 } else {
                     Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -93,16 +95,17 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
                         RetrofitInstance.setAuthToken(it.data.token)
                     }
                     saveAuthToken(context, _userLoginResponse.value?.data?.token.toString())
+                    getUser().let {
+                            homeViewModel.getHomeData().let {
+                                homeViewModel.getCategories().let {
+                                    navigator.push(MainScreen(homeViewModel,user))
+                                    _isLoading.value = false
 
-                    if (getUser()) {
-                       homeViewModel.getHomeData().let {
-                           homeViewModel.getCategories().let {
-                               navigator.push(MainScreen(homeViewModel))
-                               _isLoading.value = false
+                                }
+                            }
 
-                           }
-                       }
                     }
+
                 } else {
                     Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -113,23 +116,25 @@ class AuthViewModel(private val navigator: Navigator, val context: Context) : Vi
         }
     }
 
-    private suspend fun getUser(): Boolean {
-        return try {
-            val response = api.getUser()
-            Log.d("AuthViewModel", "Get User Response: ${response.body()}")
-            if (response.isSuccessful) {
-                _user.value = response.body()
-                true
-            } else {
-                Log.e("AuthViewModel", "Error: ${response.code()} - ${response.message()}")
-                Toast.makeText(context, "Failed to retrieve user", Toast.LENGTH_SHORT).show()
-                false
-            }
-        } catch (e: Exception) {
-            Log.e("AuthViewModel", "Error: ${e.message}", e)
-            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-            false
-        }
+      private fun getUser() {
+          viewModelScope.launch {
+              val response = api.getUser()
+              try {
+
+                  Log.d("AuthViewModel", "Get User Response: ${response.body()}")
+                  if (response.body()?.status==true) {
+                      _user.value = response.body()
+                  } else {
+                      Log.e("AuthViewModel", "Error: ${response.code()} - ${response.message()}")
+                      Toast.makeText(context, "Failed to retrieve user", Toast.LENGTH_SHORT).show()
+                  }
+              } catch (e: Exception) {
+                  Log.e("AuthViewModel", "Error: ${e.message}", e)
+                  Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+              }
+          }
+
+
     }
 
 //    private suspend fun getHomeData(): Boolean {

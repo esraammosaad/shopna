@@ -16,71 +16,69 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-class FavoriteViewModel(private val navigator: Navigator, val context: Context) : ViewModel() {
+
+
+class FavoriteViewModel(navigator: Navigator, context: Context) : ViewModel() {
+
     private val _favorite = MutableStateFlow<AddOrDeleteFavoriteResponse?>(null)
     val favorite: StateFlow<AddOrDeleteFavoriteResponse?> get() = _favorite
 
     private val _favoriteData = MutableStateFlow<GetFavoriteResponse?>(null)
-    val favoriteData:StateFlow<GetFavoriteResponse?> get() = _favoriteData
-    val authViewModel:AuthViewModel=AuthViewModel( navigator, context)
+    val favoriteData: StateFlow<GetFavoriteResponse?> get() = _favoriteData
+
+    val authViewModel: AuthViewModel = AuthViewModel(navigator, context)
     private val api = RetrofitInstance.apiClient
     var isLoading by mutableStateOf(false)
 
-    init {
+    private var dataFetched = false
 
-        fetchFavorites()
+    init {
         val languageCode = Locale.getDefault().language
         RetrofitInstance.setLanguage(languageCode)
-
     }
 
+    fun fetchFavorites(forceRefresh: Boolean = false) {
+        if (dataFetched && !forceRefresh) return
 
-
-    fun addOrDeleteFavorite( productID:Int) {
         viewModelScope.launch {
             isLoading = true
             try {
                 authViewModel.getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
-                val response = api.addOrDeleteFavorites(productID)
+                val response = api.getFavorite()
                 if (response.isSuccessful) {
-                    Log.d("Favorites", "Product added to favorites")
-                    _favorite.value =response.body()
+                    _favoriteData.value = response.body()
+                    dataFetched = true // Mark data as fetched
                 } else {
-                    Log.e("Favorites", "Failed to add product to favorites")
+                    Log.e("Favorites", "Failed to fetch favorites: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 Log.e("Favorites", "Error: ${e.message}")
-            }finally {
+            } finally {
                 isLoading = false
             }
         }
     }
 
-
-
-    fun fetchFavorites() {
-          viewModelScope.launch {
-              isLoading = true
-              try {
-                  authViewModel.getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
-                  val response = api.getFavorite()
-                  if (response.isSuccessful) {
-                      _favoriteData.value=response.body()
-                  } else {
-                      Log.e("Favorites", "Failed to fetch favorites: ${response.errorBody()?.string()}")
-                  }
-              } catch (e: Exception) {
-                  Log.e("Favorites", "Error: ${e.message}")
-              }finally {
-                  isLoading = false
-
-              }
-          }
-      }
-
-
-
+    fun addOrDeleteFavorite(productId: Int) {
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                authViewModel.getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
+                val response = api.addOrDeleteFavorites(productId)
+                if (response.isSuccessful) {
+                    Log.d("Favorites", "Product added/removed from favorites")
+                    _favorite.value = response.body()
+                    fetchFavorites(forceRefresh = true) // Refresh favorites after update
+                } else {
+                    Log.e("Favorites", "Failed to add/remove product to/from favorites")
+                }
+            } catch (e: Exception) {
+                Log.e("Favorites", "Error: ${e.message}")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 }
-
 
 

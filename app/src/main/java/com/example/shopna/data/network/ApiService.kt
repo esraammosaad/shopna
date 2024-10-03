@@ -1,7 +1,8 @@
 package com.example.shopna.data.network
 
 import com.example.shopna.data.model.AddOrDeleteFavoriteResponse
-import com.example.shopna.data.model.Categories
+import com.example.shopna.data.model.CategoryDetailsResponse
+import com.example.shopna.data.model.GetCategoryResponse
 import com.example.shopna.data.model.GetFavoriteResponse
 import com.example.shopna.data.model.GetUserResponse
 import com.example.shopna.data.model.Home
@@ -16,7 +17,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -39,10 +39,10 @@ interface ApiService{
     suspend fun getHomeData():Response<Home>
 
     @GET("categories")
-    suspend fun getCategories():Response<Categories>
+    suspend fun getCategories():Response<GetCategoryResponse>
 
     @GET("categories/{id}")
-    suspend fun getProductsByCategory(@Path("id") categoryId: Int): Response<Categories>
+    suspend fun getProductsByCategory(@Path("id") categoryId: Int): Response<CategoryDetailsResponse>
 
     @GET("favorites")
     suspend fun getFavorite():Response<GetFavoriteResponse>
@@ -50,12 +50,6 @@ interface ApiService{
     @FormUrlEncoded
     @POST("favorites")
     suspend fun addOrDeleteFavorites(@Field("product_id") productId: Int): Response<AddOrDeleteFavoriteResponse>
-
-
-
-    @DELETE("favorites/{id}")
-    suspend fun removeFromFavorites(@Path("id") productId: Int): Response<Unit>
-
 
 
 

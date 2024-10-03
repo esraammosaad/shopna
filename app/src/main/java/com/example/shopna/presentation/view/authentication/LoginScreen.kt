@@ -165,7 +165,7 @@ class LoginScreen(private val context: Context) : Screen{
                     } )
                 }
             }
-        } else Navigator(MainScreen(authViewModel.homeViewModel))
+        } else Navigator(MainScreen(authViewModel.homeViewModel,authViewModel.user))
 
     }
 
@@ -189,7 +189,7 @@ fun CustomTextSpan(textOne:String,  textTwo:String, onClick:()->Unit ){
 
 
             },
-            fontSize = 14.sp,
+            fontSize = LocalConfiguration.current.fontScale.times(20).sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.W400,
             fontFamily = FontFamily(Font(R.font.interregular)),
@@ -240,7 +240,7 @@ fun CustomSignInMethodsRow(text :String){
                 }
 
             },
-            fontSize = 11.sp,
+            fontSize = LocalConfiguration.current.fontScale.times(16).sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.W400,
             fontFamily = FontFamily(Font(R.font.interregular)),

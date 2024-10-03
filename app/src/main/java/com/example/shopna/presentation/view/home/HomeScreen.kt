@@ -23,11 +23,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,187 +47,211 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.shopna.data.model.DataCategories
-import com.example.shopna.data.model.Products
 import com.example.shopna.presentation.view_model.HomeViewModel
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
-import com.example.shopna.presentation.view_model.AuthViewModel
+import com.example.shopna.data.model.Banners
+import com.example.shopna.data.model.DataXXXXXXXXX
+import com.example.shopna.data.model.Products
+import com.example.shopna.data.model.GetUserResponse
 import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.ui.theme.greyColor
 import com.example.shopna.ui.theme.kPrimaryColor
 import com.example.shopna.ui.theme.lightGreyColor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 
-@Composable
-fun HomeScreen(homeViewModel: HomeViewModel,favoriteViewModel: FavoriteViewModel) {
-    val homeData by homeViewModel.products.collectAsState()
-    val categories by homeViewModel.categories.collectAsState()
+class  HomeScreen(
+    private val homeViewModel: HomeViewModel,
+    private val favoriteViewModel: FavoriteViewModel,
+    private val user: StateFlow<GetUserResponse?>
+) : Screen {
+    @Composable
+    override fun Content() {
 
 
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        item {
-            Column (
-                modifier = Modifier
-                    .fillMaxSize()
-
-            ){
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()) {
-                    Column {
-                        Text(text = stringResource(id = R.string.welcome_back)+"!", style = TextStyle(
-                            fontSize = 18.sp,
-                            color = greyColor,
-                            fontFamily = FontFamily(Font(R.font.interregular)),
-                            fontWeight = FontWeight.W200
-                        ))
-                        Spacer(modifier = Modifier.height(3.dp))
-                        Text(text = "Esraa Mosaad", style = TextStyle(
-                            fontSize = 16.sp,
-                            color = Color.Black,
-                            fontFamily = FontFamily(Font(R.font.interregular)),
-                            fontWeight = FontWeight.Bold
-
-                        ))
-                    }
-                    Row {
-                        CustomIcon(icon =painterResource(id = R.drawable.magnifyingglass) , onClick = {})
-                        Spacer(modifier = Modifier.width(10.dp))
-                        CustomIcon(icon = painterResource(id = R.drawable.notification) , onClick = {})
-
-                    }
+        homeViewModel.getHomeData()
+        val homeData by homeViewModel.products.collectAsState()
+        val categories by homeViewModel.categories.collectAsState()
+        val userData =user.collectAsState()
 
 
 
 
-                }
-                Spacer(modifier = Modifier.height(15.dp))
 
-                Box {
-                    Card (modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .wrapContentHeight(),
-                        colors = CardDefaults.cardColors(kPrimaryColor)
-                    )
-                    {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            item {
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize()
 
-                        Column (  modifier = Modifier.padding(16.dp)){
-                            Text(
-                                stringResource(id = R.string.new_collection),
-                                style = TextStyle(color = Color.White,
-                                    fontSize = 20.sp,
-                                    fontFamily = FontFamily(Font(R.font.interregular)),
-                                    fontWeight = FontWeight.Bold),
+                ){
 
-
-                                )
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()) {
+                        Column {
+                            Text(text = stringResource(id = R.string.welcome_back)+"!", style = TextStyle(
+                                fontSize = 18.sp,
+                                color = greyColor,
+                                fontFamily = FontFamily(Font(R.font.interregular)),
+                                fontWeight = FontWeight.W200
+                            ))
                             Spacer(modifier = Modifier.height(3.dp))
-                            Text(
-                                stringResource(id = R.string.discount_offer),
-                                style = TextStyle(color = Color.White.copy(alpha = 0.6f),
-                                    fontSize = 14.sp,
-                                    fontFamily = FontFamily(Font(R.font.interregular)),
-                                    fontWeight = FontWeight.W100),
-                                lineHeight = 18.sp
+                            Text(text = userData.value?.data?.name?:"", style = TextStyle(
+                                fontSize = 16.sp,
+                                color = Color.Black,
+                                fontFamily = FontFamily(Font(R.font.interregular)),
+                                fontWeight = FontWeight.Bold
 
-                            )
-                            Box(modifier = Modifier
-                                .wrapContentSize()
-                                .padding(vertical = 10.dp)
-                                .clip(shape = RoundedCornerShape(8.dp))
-                                .background(Color.White)) {
-                                Text(
-                                    stringResource(id = R.string.shop_now),modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .padding(8.dp),
-                                    style = TextStyle(
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        fontFamily =  FontFamily(Font(R.font.interregular))))
-                            }
-
+                            ))
+                        }
+                        Row {
+                            CustomIcon(icon =painterResource(id = R.drawable.magnifyingglass) , onClick = {})
+                            Spacer(modifier = Modifier.width(10.dp))
+                            CustomIcon(icon = painterResource(id = R.drawable.notification) , onClick = {})
 
                         }
 
 
-                    }
-                    Box(modifier = Modifier.align(Alignment.BottomEnd))   {
 
-                    Image(
-                        painter = painterResource(id = R.drawable.headset),
-                        contentDescription ="",
-                        modifier = Modifier.size(130.dp) ,
-                        alignment = Alignment.CenterEnd
-                    )
-                    }
 
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Box {
+                        Card (modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .wrapContentHeight(),
+                            colors = CardDefaults.cardColors(kPrimaryColor)
+                        )
+                        {
+
+                            Column (  modifier = Modifier.padding(16.dp)){
+                                Text(
+                                    stringResource(id = R.string.new_collection),
+                                    style = TextStyle(color = Color.White,
+                                        fontSize = 20.sp,
+                                        fontFamily = FontFamily(Font(R.font.interregular)),
+                                        fontWeight = FontWeight.Bold),
+
+
+                                    )
+                                Spacer(modifier = Modifier.height(3.dp))
+                                Text(
+                                    stringResource(id = R.string.discount_offer),
+                                    style = TextStyle(color = Color.White.copy(alpha = 0.6f),
+                                        fontSize = 14.sp,
+                                        fontFamily = FontFamily(Font(R.font.interregular)),
+                                        fontWeight = FontWeight.W100),
+                                    lineHeight = 18.sp
+
+                                )
+                                Box(modifier = Modifier
+                                    .wrapContentSize()
+                                    .padding(vertical = 10.dp)
+                                    .clip(shape = RoundedCornerShape(8.dp))
+                                    .background(Color.White)) {
+                                    Text(
+                                        stringResource(id = R.string.shop_now),modifier = Modifier
+                                            .align(Alignment.Center)
+                                            .padding(8.dp),
+                                        style = TextStyle(
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily =  FontFamily(Font(R.font.interregular)),
+                                            color = Color.Black
+
+                                        ))
+                                }
+
+
+                            }
+
+
+                        }
+                        Box(modifier = Modifier.align(Alignment.BottomEnd))   {
+
+                            Image(
+                                painter = painterResource(id = R.drawable.headset),
+                                contentDescription ="",
+                                modifier = Modifier.size(130.dp) ,
+                                alignment = Alignment.CenterEnd
+                            )
+                        }
+
+                    }
                 }
+                Spacer(modifier = Modifier.height(4.dp))
+
+                CustomText(text = stringResource(id = R.string.categories))
+                Spacer(modifier = Modifier.height(4.dp))
+                if (homeViewModel.categories == null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = kPrimaryColor)
+                    }
+                }else{ categories?.data?.data?.let { categoriesData ->
+                    CategorySection(categoriesData,homeViewModel,favoriteViewModel)
+                }}
+                Spacer(modifier = Modifier.height(8.dp))
+
             }
-            Spacer(modifier = Modifier.height(4.dp))
 
-            CustomText(text = stringResource(id = R.string.categories))
-            Spacer(modifier = Modifier.height(4.dp))
-            if (homeViewModel.isLoading) {
-                Box(
-                    modifier = Modifier
+            item{
+                CustomText(text = stringResource(id = R.string.recommendations))
+
+
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                if (homeViewModel.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .height(80.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = kPrimaryColor)
+                    }
+                }else{ homeData?.dataa?.products?.let { products ->
+                    ProductGrid(products, favoriteViewModel, Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = kPrimaryColor)
-                }
-            }else{ categories?.data?.data?.let { categoriesData ->
-                CategorySection(categoriesData)
-            }}
-            Spacer(modifier = Modifier.height(8.dp))
-
-        }
-
-        item{
-            CustomText(text = stringResource(id = R.string.recommendations))
-
-
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            if (homeViewModel.products.collectAsState().value==null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .height(80.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = kPrimaryColor)
-                }
-            }else{ homeData?.dataa?.products?.let { products ->
-                ProductGrid(products, favoriteViewModel)
-            }}
+                        .height(LocalConfiguration.current.screenHeightDp.dp/2))
+                }}
+            }
         }
     }
+
 }
 
 
@@ -264,7 +289,7 @@ private fun CustomText(text:String) {
 }
 
 @Composable
-private fun CustomIcon(icon: Painter,onClick:()->Unit) {
+ fun CustomIcon(icon: Painter,onClick:()->Unit) {
     Box(modifier = Modifier
         .size(35.dp)
         .clip(CircleShape)
@@ -292,7 +317,10 @@ private fun CustomIcon(icon: Painter,onClick:()->Unit) {
 
 
 @Composable
-fun CategorySection(categories: List<DataCategories>) {
+fun CategorySection(
+    categories: List<DataXXXXXXXXX>,
+    homeViewModel: HomeViewModel,
+    favoriteViewModel: FavoriteViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     val categoriesPhotos= mutableListOf(
         R.drawable.chip
@@ -314,7 +342,8 @@ fun CategorySection(categories: List<DataCategories>) {
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
                         .clickable {
-                            navigator.push(CategoryProductsScreen(categories[index].id ?: 0))
+                            homeViewModel.getProductsByCategory(categories[index].id)
+                            navigator.push(CategoryProductsScreen(homeViewModel.categoryProducts,categories[index].name,favoriteViewModel,homeViewModel))
                         },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -328,7 +357,7 @@ fun CategorySection(categories: List<DataCategories>) {
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = (categories[index].name?.substring(0, 5) + ".."),
+                        text = (categories[index].name.substring(0, 5) + ".."),
                         style = TextStyle(
                             fontSize = 12.sp,
                             fontFamily = FontFamily(Font(R.font.interregular)),
@@ -344,16 +373,14 @@ fun CategorySection(categories: List<DataCategories>) {
 }
 
 @Composable
-fun ProductGrid(products: List<Products>,favoriteViewModel: FavoriteViewModel) {
+fun ProductGrid(products: List<Products>, favoriteViewModel: FavoriteViewModel,modifier: Modifier=Modifier) {
     LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(LocalConfiguration.current.screenHeightDp.dp / 2),
+            modifier = modifier,
         ) {
             items(products) { product ->
-                ProductItem(product, favoriteViewModel )
+                ProductItem(product, favoriteViewModel,products.indexOf(product) )
             }
         }
 
@@ -362,12 +389,10 @@ fun ProductGrid(products: List<Products>,favoriteViewModel: FavoriteViewModel) {
 
 
 @Composable
-fun ProductItem(product: Products,favoriteViewModel: FavoriteViewModel) {
+fun ProductItem(product: Products, favoriteViewModel: FavoriteViewModel, indexOf: Int) {
     val navigator = LocalNavigator.currentOrThrow
-    val context=LocalContext.current
-    val favorite by favoriteViewModel.favorite.collectAsState()
     var isFavorite by remember { mutableStateOf(product.inFavorites) }
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
     Box(
         modifier = Modifier
             .padding(8.dp)
@@ -376,7 +401,7 @@ fun ProductItem(product: Products,favoriteViewModel: FavoriteViewModel) {
             modifier = Modifier
                 .height(195.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .clickable { navigator.push(DetailsScreen(product)) },
+                .clickable { navigator.push(DetailsScreen(product, favoriteViewModel)) },
             colors = CardDefaults.cardColors(containerColor = Color.White)
 
         ) {
@@ -457,13 +482,13 @@ fun ProductItem(product: Products,favoriteViewModel: FavoriteViewModel) {
             }
         }
 
-        if (product.discount != 0 && product.discount!=null) {
+        if (product.discount != 0) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(5.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(kPrimaryColor.copy(alpha = 0.4f))
+                    .background(kPrimaryColor.copy(alpha = 0.6f))
                     .padding(horizontal = 5.dp, vertical = 3.dp)
             ) {
                 Text(
@@ -476,132 +501,81 @@ fun ProductItem(product: Products,favoriteViewModel: FavoriteViewModel) {
         }
         Box(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(6.dp)
-                .size(24.dp)
-        ) {
+                .size(30.dp)
+                .padding(5.dp)
+                .align(Alignment.TopStart)) {
             IconButton(
                 onClick = {
+                    selectedIndex = indexOf
                     favoriteViewModel.addOrDeleteFavorite(product.id!!)
-                    isFavorite=!isFavorite!!
+                    isFavorite = !isFavorite!!
                     favoriteViewModel.fetchFavorites()
-                    product.inFavorites=isFavorite
-                    selectedIndex=product.id!!
+                    product.inFavorites = isFavorite
 
 
                 },
                 modifier = Modifier.size(18.dp)
             ) {
-                if(favoriteViewModel.isLoading && selectedIndex==product.id)
+                if (favoriteViewModel.isLoading && selectedIndex == indexOf)
                     CircularProgressIndicator(
                         color = kPrimaryColor,
-                        modifier = Modifier.size(13.dp)) else Icon(
-                    imageVector = if (isFavorite==true) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                        modifier = Modifier.size(13.dp)
+                    ) else Icon(
+                    imageVector = if (isFavorite == true) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorite",
-                    tint = kPrimaryColor.copy(alpha = 0.4f)
+                    tint = kPrimaryColor.copy(alpha = 0.6f)
                 )
             }
         }
+
     }
 
 
 }
-//
-//@Composable
-//fun FavoriteIcon(product: Products, viewModel: HomeViewModel) {
-//    val isFavorite = viewModel.favoritesList.collectAsState().value.any { it.id == product.id }
-//    Box(
-//        modifier = Modifier
-//            .size(40.dp)
-//            .background(
-//                color = Color(0xff6C2DC7),
-//                shape = RoundedCornerShape(
-//                    topEnd = 20.dp,
-//                    bottomStart = 10.dp
-//                )
-//            )
-//            .clickable {
-//                val productId: Int? = product.id
-//                if (productId != null) {
-//                    if (isFavorite) {
-//                        viewModel.removeFavorite(productId)
-//                    } else {
-//                        val favoriteProduct = FavoriteProducts(
-//                            id = product.id,
-//                            price = product.price,
-//                            oldPrice = product.oldPrice,
-//                            discount = product.discount,
-//                            image = product.image,
-//                            name = product.name,
-//                            description = product.description
-//                        )
-//                        viewModel.addFavorite(
-//                            FavoriteRequest(productId = productId),
-//                            favoriteProduct
-//                        )
-//                    }
-//                }
-//            },
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Icon(
-//            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-//            contentDescription = "Favorite Icon",
-//            tint = if (isFavorite) Color.White else Color.White,
-//            modifier = Modifier.size(22.dp)
-//        )
-//    }
-//}
 
 
 
-//@Composable
-//fun AutoScrollingBannerSection(banners: List<Banners>) {
-//    val listState = rememberLazyListState()
-//    val coroutineScope = rememberCoroutineScope()
-//    val bannerCount = banners.size
-//
-//    LaunchedEffect(Unit) {
-//        coroutineScope.launch {
-//            while (true) {
-//                delay(2000L)
-//
-//                val nextIndex = (listState.firstVisibleItemIndex + 1) % bannerCount
-//                listState.animateScrollToItem(nextIndex)
-//            }
-//        }
-//    }
-//
-//    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-//        Spacer(modifier = Modifier.height(36.dp))
-//        LazyRow(
-//            state = listState,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(LocalConfiguration.current.screenHeightDp.dp / 3),
-//        ) {
-//            itemsIndexed(banners) { index, banner ->
-//                val scale = if (index == listState.firstVisibleItemIndex) 1.2f else 1f
-//
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(8.dp)
-//                        .clip(RoundedCornerShape(12.dp))
-//                        .graphicsLayer(scaleX = scale, scaleY = scale)
-//                ) {
-//                    AsyncImage(
-//                        model = banner.image,
-//                        contentDescription = "Banner $index",
-//                        contentScale = ContentScale.Crop,
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .clip(RoundedCornerShape(12.dp))
-//                    )
-//                }
-//            }
-//        }
-//
-//        // PageIndicator(items = banners, currentPage = listState.firstVisibleItemIndex + 1, kPrimaryColor)
-//    }
-//}
+
+
+@Composable
+fun AutoScrollingBannerSection(banners: List<Banners>) {
+    val bannerCount = banners.size
+    val pagerState = rememberPagerState(
+        pageCount = { bannerCount },
+        initialPage = 0,
+
+        )
+    LaunchedEffect(pagerState.currentPage) {
+        while (true) {
+            delay(3000)
+            val nextPage = if(pagerState.currentPage+1 == pagerState.pageCount) 0 else pagerState.currentPage + 1
+            pagerState.scrollToPage(nextPage)
+        }
+    }
+
+
+
+
+
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(modifier = Modifier.height(36.dp))
+        HorizontalPager(
+            state =pagerState ,
+            modifier = Modifier
+                .wrapContentSize()
+        ) {index->
+            AsyncImage(
+                model = banners[index].image,
+                contentDescription = "banner $index",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(LocalConfiguration.current.screenHeightDp.dp / 3)
+            )
+
+
+        }
+
+        // PageIndicator(items = banners, currentPage = listState.firstVisibleItemIndex + 1, kPrimaryColor)
+    }
+}

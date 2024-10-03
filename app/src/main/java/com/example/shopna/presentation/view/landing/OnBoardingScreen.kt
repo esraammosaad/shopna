@@ -120,7 +120,7 @@ class OnBoardingScreen() : Screen{
 
 @Composable
 fun <T> PageIndicator(items:List<T>,currentPage:Int,color:Color?=null){
-    Row {
+    Row(Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.Center) {
         repeat(items.size){
             val width= animateDpAsState(targetValue =if( it==currentPage) 25.dp else 8.dp,
                 label = "",
@@ -190,7 +190,7 @@ fun OnBoardingPager(
                               Column(
                                   modifier = Modifier
                                       .fillMaxSize()
-                                      .padding(8.dp),
+                                      .padding(LocalConfiguration.current.screenWidthDp.dp*0.04f),
                                   horizontalAlignment = Alignment.CenterHorizontally,
                                   verticalArrangement = Arrangement.Center
                               ) {
@@ -200,7 +200,7 @@ fun OnBoardingPager(
                                       text = item[page].title,
                                       fontFamily = FontFamily.SansSerif,
                                       color = backgroundColor,
-                                      fontSize = 20.sp,
+                                      fontSize = LocalConfiguration.current.fontScale.times(28).sp,
                                       fontWeight = FontWeight.Bold
                                   )
                                   Spacer(modifier = Modifier.height(10.dp))
@@ -213,7 +213,7 @@ fun OnBoardingPager(
                                       fontWeight = FontWeight.Light,
                                       fontFamily = FontFamily.SansSerif,
                                       color = Color(0xffe0e0e0),
-                                      fontSize = 14.sp
+                                      fontSize = LocalConfiguration.current.fontScale.times(16).sp
                                   )
                                   Spacer(modifier = Modifier.height(20.dp))
 
@@ -234,7 +234,7 @@ fun OnBoardingPager(
                                           Text(text = stringResource(id = R.string.skip), style = TextStyle(
                                               color = Color.White,
                                               fontFamily = FontFamily.Monospace,
-                                              fontSize = 15.sp,
+                                              fontSize = LocalConfiguration.current.fontScale.times(18).sp,
                                               fontWeight = FontWeight.Medium
                                           )
                                           )
@@ -263,12 +263,12 @@ fun OnBoardingPager(
                                                   1.dp,
                                                   Color.White.copy(alpha = 0.6f)
                                               ),
-                                              shape = RoundedCornerShape(if(pagerState.currentPage==item.size-1) 45 else 60),
+                                              shape = RoundedCornerShape(if(pagerState.currentPage==item.size-1) LocalConfiguration.current.screenWidthDp.dp * 0.05f else  LocalConfiguration.current.screenWidthDp.dp * 0.06f),
                                               colors = ButtonDefaults.outlinedButtonColors(
 
                                                   contentColor = kPrimaryColor
                                               ),
-                                              modifier =  if(pagerState.currentPage==item.size-1) Modifier.width(100.dp)else Modifier.size(38.dp)
+                                              modifier =  if(pagerState.currentPage==item.size-1) Modifier.width(LocalConfiguration.current.screenWidthDp.dp * 0.4f)else Modifier.size(LocalConfiguration.current.screenWidthDp.dp * 0.12f)
 
 
                                           )  {
@@ -279,7 +279,7 @@ fun OnBoardingPager(
                                           if(pagerState.currentPage==item.size-1){
                                               Text(text = stringResource(id = R.string.getStarted),
                                                   modifier = Modifier.align(Alignment.Center),
-                                                  fontSize = 12.sp,
+                                                  fontSize = LocalConfiguration.current.fontScale.times(18).sp,
                                                   color = Color.White,
                                                   fontWeight = FontWeight.Medium,
                                                   fontFamily = FontFamily.Serif)
@@ -293,7 +293,7 @@ fun OnBoardingPager(
                                                   contentDescription ="next icon",
                                                   tint = Color.White.copy(alpha = 0.6f),
                                                   modifier = Modifier
-                                                      .size(20.dp)
+                                                      .size(LocalConfiguration.current.screenWidthDp.dp * 0.06f)
                                                       .align(Alignment.Center)
 
 
