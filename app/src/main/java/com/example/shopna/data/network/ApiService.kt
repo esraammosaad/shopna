@@ -1,7 +1,9 @@
 package com.example.shopna.data.network
 
 import com.example.shopna.data.model.AddOrDeleteFavoriteResponse
+import com.example.shopna.data.model.AddOrRemoveCartResponse
 import com.example.shopna.data.model.CategoryDetailsResponse
+import com.example.shopna.data.model.GetCartResponse
 import com.example.shopna.data.model.GetCategoryResponse
 import com.example.shopna.data.model.GetFavoriteResponse
 import com.example.shopna.data.model.GetUserResponse
@@ -10,6 +12,7 @@ import com.example.shopna.data.model.LoginRequest
 import com.example.shopna.data.model.LoginResponse
 import com.example.shopna.data.model.RegisterRequest
 import com.example.shopna.data.model.RegisterResponse
+import com.example.shopna.data.model.UpdateCartResponse
 import com.example.shopna.interceptor.AuthInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -21,6 +24,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import java.util.concurrent.TimeUnit
 
@@ -50,6 +54,17 @@ interface ApiService{
     @FormUrlEncoded
     @POST("favorites")
     suspend fun addOrDeleteFavorites(@Field("product_id") productId: Int): Response<AddOrDeleteFavoriteResponse>
+
+    @GET("carts")
+    suspend fun getCart():Response<GetCartResponse>
+
+    @FormUrlEncoded
+    @POST("carts")
+    suspend fun addOrDeleteCart(@Field("product_id") productId: Int): Response<AddOrRemoveCartResponse>
+
+    @FormUrlEncoded
+    @PUT("carts/{id}")
+    suspend fun updateCart(@Path("id") id: Int,  @Field("quantity") quantity:Int): Response<UpdateCartResponse>
 
 
 

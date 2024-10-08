@@ -32,6 +32,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
 import com.example.shopna.data.model.CategoryDetailsResponse
+import com.example.shopna.presentation.view_model.CartViewModel
 import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.kPrimaryColor
@@ -41,7 +42,8 @@ class CategoryProductsScreen(
     private val categoryProducts: StateFlow<CategoryDetailsResponse?>,
     private val nameOfCategories: String,
     private val favoriteViewModel: FavoriteViewModel,
-    private val homeViewModel: HomeViewModel
+    private val homeViewModel: HomeViewModel,
+    private val cartViewModel: CartViewModel
 ) : Screen {
     @Composable
     override fun Content() {
@@ -98,7 +100,7 @@ class CategoryProductsScreen(
                     if (products != null) {
                         ProductGrid(products, favoriteViewModel, Modifier
                             .fillMaxWidth()
-                            .height(LocalConfiguration.current.screenHeightDp.dp))
+                            .height(LocalConfiguration.current.screenHeightDp.dp),cartViewModel)
                     }
                 }}
             }

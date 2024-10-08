@@ -63,8 +63,9 @@ fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeView
     val navigator = LocalNavigator.currentOrThrow
     val favoriteProducts by favoriteViewModel.favoriteData.collectAsState()
     val homeData = homeViewModel.products.collectAsState()
-    val isLoading = favoriteViewModel.isLoading
     var selectedIndex by remember { mutableIntStateOf(0) }
+    val favoriteIsLoading by favoriteViewModel.isLoading.collectAsState()
+
 
     Column(
         modifier = Modifier
@@ -196,7 +197,7 @@ fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeView
 
                             Box(
                                 modifier = Modifier
-                                    .padding(horizontal = 8.dp, vertical = 12.dp)
+                                    .padding(horizontal = 5.dp, vertical = 12.dp)
                                     .align(Alignment.TopStart)
                             ) {
                                 var isFavorite by remember {
@@ -210,9 +211,9 @@ fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeView
                                         selectedIndex = favoriteProduct.product.id
                                         favoriteViewModel.fetchFavorites()
                                     },
-                                    modifier = Modifier.size(25.dp)
+                                    modifier = Modifier.size(22.dp)
                                 ) {
-                                    if (favoriteViewModel.isLoading && selectedIndex == favoriteProduct.product.id) {
+                                    if (favoriteIsLoading && selectedIndex == favoriteProduct.product.id) {
                                         CircularProgressIndicator(
                                             color = kPrimaryColor,
                                             modifier = Modifier.size(32.dp)

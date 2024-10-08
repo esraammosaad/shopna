@@ -34,7 +34,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,6 +86,9 @@ class DetailsScreen(private val product: Products, private val favoriteViewModel
         var isMoreClicked by remember { mutableStateOf(false) }
         var selectedIndex by remember { mutableIntStateOf(0) }
         var quantity by remember { mutableIntStateOf(1) }
+        val favoriteIsLoading by favoriteViewModel.isLoading.collectAsState()
+
+
 
 
         LaunchedEffect(pagerState.currentPage) {
@@ -179,7 +184,7 @@ class DetailsScreen(private val product: Products, private val favoriteViewModel
                               modifier = Modifier.align(alignment = Alignment.TopEnd)
                                   .padding(5.dp)
                                   .clip(RoundedCornerShape(4.dp))
-                                  .background(kPrimaryColor.copy(alpha = 0.8f))
+                                  .background(kPrimaryColor.copy(alpha = 0.6f))
                                   .padding(horizontal = 8.dp, vertical = 10.dp)
                           ) {
                               Text(
@@ -251,7 +256,7 @@ class DetailsScreen(private val product: Products, private val favoriteViewModel
                                     },
                                     modifier = Modifier.size(32.dp)
                                 ) {
-                                    if(favoriteViewModel.isLoading && selectedIndex==product.id)
+                                    if(favoriteIsLoading && selectedIndex==product.id)
                                         CircularProgressIndicator(
                                             color = kPrimaryColor,
                                             modifier = Modifier.size(32.dp)) else Icon(

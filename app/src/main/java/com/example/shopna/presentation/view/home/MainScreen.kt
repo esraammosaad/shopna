@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
 import com.example.shopna.data.model.GetUserResponse
+import com.example.shopna.presentation.view_model.CartViewModel
 import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.backgroundColor
@@ -45,6 +46,9 @@ class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<G
         val favoriteViewModel: FavoriteViewModel = remember {
             FavoriteViewModel(navigator,context)
         }
+        val cartViewModel: CartViewModel = remember {
+            CartViewModel(navigator,context)
+        }
         Scaffold(
             containerColor = backgroundColor,
             content ={
@@ -55,7 +59,7 @@ class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<G
                     when (selectedIndex) {
                         0 -> {
                         
-                           Navigator(screen = HomeScreen(homeViewModel,favoriteViewModel,user))
+                           return@Column HomeScreen(homeViewModel,favoriteViewModel,user=user,cartViewModel=cartViewModel)
                         }
                         1 -> {
 
@@ -64,7 +68,7 @@ class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<G
                         }
                         2 -> {
 
-                            return@Column CartScreen()
+                            return@Column CartScreen(cartViewModel=cartViewModel,homeViewModel=homeViewModel,favoriteViewModel=favoriteViewModel)
                         }
                         3 -> {
 

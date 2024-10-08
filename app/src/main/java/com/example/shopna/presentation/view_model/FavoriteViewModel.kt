@@ -2,9 +2,6 @@ package com.example.shopna.presentation.view_model
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.Navigator
@@ -16,8 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-
-
 class FavoriteViewModel(navigator: Navigator, context: Context) : ViewModel() {
 
     private val _favorite = MutableStateFlow<AddOrDeleteFavoriteResponse?>(null)
@@ -26,10 +21,11 @@ class FavoriteViewModel(navigator: Navigator, context: Context) : ViewModel() {
     private val _favoriteData = MutableStateFlow<GetFavoriteResponse?>(null)
     val favoriteData: StateFlow<GetFavoriteResponse?> get() = _favoriteData
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
     val authViewModel: AuthViewModel = AuthViewModel(navigator, context)
     private val api = RetrofitInstance.apiClient
-    var isLoading by mutableStateOf(false)
-
     private var dataFetched = false
 
     init {
@@ -41,27 +37,27 @@ class FavoriteViewModel(navigator: Navigator, context: Context) : ViewModel() {
         if (dataFetched && !forceRefresh) return
 
         viewModelScope.launch {
-            isLoading = true
+            _isLoading.value = true
             try {
                 authViewModel.getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
                 val response = api.getFavorite()
                 if (response.isSuccessful) {
                     _favoriteData.value = response.body()
-                    dataFetched = true // Mark data as fetched
+                    dataFetched = true
                 } else {
                     Log.e("Favorites", "Failed to fetch favorites: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 Log.e("Favorites", "Error: ${e.message}")
             } finally {
-                isLoading = false
+                _isLoading.value = false
             }
         }
     }
 
     fun addOrDeleteFavorite(productId: Int) {
         viewModelScope.launch {
-            isLoading = true
+            _isLoading.value = true
             try {
                 authViewModel.getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
                 val response = api.addOrDeleteFavorites(productId)
@@ -75,10 +71,8 @@ class FavoriteViewModel(navigator: Navigator, context: Context) : ViewModel() {
             } catch (e: Exception) {
                 Log.e("Favorites", "Error: ${e.message}")
             } finally {
-                isLoading = false
+                _isLoading.value = false
             }
         }
     }
 }
-
-
