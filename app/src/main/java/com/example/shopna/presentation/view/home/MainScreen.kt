@@ -26,7 +26,6 @@ import com.example.shopna.ui.theme.lightGreyColor
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
 import com.example.shopna.data.model.GetUserResponse
@@ -37,7 +36,7 @@ import com.example.shopna.ui.theme.backgroundColor
 import kotlinx.coroutines.flow.StateFlow
 
 
-class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<GetUserResponse?>) :Screen {
+class MainScreen(private val homeViewModel: HomeViewModel, private val user: StateFlow<GetUserResponse?>) :Screen {
     @Composable
     override fun Content() {
         val navigator=LocalNavigator.currentOrThrow
@@ -58,7 +57,7 @@ class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<G
 
                     when (selectedIndex) {
                         0 -> {
-                        
+
                            return@Column HomeScreen(homeViewModel,favoriteViewModel,user=user,cartViewModel=cartViewModel)
                         }
                         1 -> {
@@ -72,7 +71,7 @@ class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<G
                         }
                         3 -> {
 
-                            return@Column ProfileScreen()
+                            return@Column ProfileScreen(user)
                         }
                     }
 
@@ -88,7 +87,7 @@ class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<G
                     .wrapContentHeight(),
                 containerColor = Color.White,
 
-                ) { 
+                ) {
                 NavigationBarItem(
                     colors = NavigationBarItemDefaults.colors(
                         unselectedIconColor = lightGreyColor,
@@ -155,8 +154,8 @@ class MainScreen(private val homeViewModel: HomeViewModel, val user: StateFlow<G
                     }
                 )
             } }
-            
-        ) 
+
+        )
 
 
     }

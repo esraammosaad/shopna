@@ -466,7 +466,7 @@ fun ProductItem(product: Products, favoriteViewModel: FavoriteViewModel, indexOf
                                 selectedIndex = indexOf
                                 cartViewModel.addOrDeleteCart(product.id!!)
                                 inCart = !inCart!!
-                                cartViewModel.fetchCartData()
+                                cartViewModel.fetchCartData(true)
                                 product.inCart = inCart
                             },
                         ) {
