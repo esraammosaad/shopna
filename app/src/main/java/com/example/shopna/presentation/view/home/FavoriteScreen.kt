@@ -79,7 +79,7 @@ fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeView
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Favorites",
+                text = stringResource(id = R.string.favorite),
                 style = TextStyle(
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,

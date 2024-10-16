@@ -106,14 +106,16 @@ class RegisterScreen : Screen{
                         text = stringResource(id = R.string.password),
                         value = password,
                         error = passwordError.value,
-                        errorMessage = passwordErrorMessage.value
+                        errorMessage = passwordErrorMessage.value,
+                        isPassword = true
                     )
                     Spacer(Modifier.height(2.dp))
                     CustomTextField(
                         text = stringResource(id = R.string.phone_number),
                         value = phoneNumber,
                         error = phoneNumberError.value,
-                        errorMessage = phoneNumberErrorMessage.value
+                        errorMessage = phoneNumberErrorMessage.value,
+
                     )
 
                     Spacer(Modifier.height(15.dp))

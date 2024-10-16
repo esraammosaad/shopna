@@ -11,11 +11,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shopna.ui.theme.kPrimaryColor
 import kotlinx.coroutines.delay
+import com.example.shopna.R
 
 @Composable
 fun SplashScreen(onSplashFinished: () -> Unit) {
@@ -40,12 +42,14 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
             exit = androidx.compose.animation.fadeOut(animationSpec = tween(durationMillis = 500))
         ) {
             Text(
-                text = "Shopna.",
+                text = stringResource(id = R.string.app_name),
                 style = TextStyle(
                     fontSize = 45.sp,
                     color = kPrimaryColor
                 ),
-                modifier = Modifier.padding(bottom = 100.dp).align(Alignment.Center)
+                modifier = Modifier
+                    .padding(bottom = 100.dp)
+                    .align(Alignment.Center)
             )
         }
     }

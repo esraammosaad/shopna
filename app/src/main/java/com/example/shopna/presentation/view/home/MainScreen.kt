@@ -28,15 +28,13 @@ import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
-import com.example.shopna.data.model.GetUserResponse
+import com.example.shopna.presentation.view_model.AuthViewModel
 import com.example.shopna.presentation.view_model.CartViewModel
 import com.example.shopna.presentation.view_model.FavoriteViewModel
-import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.backgroundColor
-import kotlinx.coroutines.flow.StateFlow
 
 
-class MainScreen(private val homeViewModel: HomeViewModel, private val user: StateFlow<GetUserResponse?>) :Screen {
+class MainScreen(private val authViewModel: AuthViewModel) :Screen {
     @Composable
     override fun Content() {
         val navigator=LocalNavigator.currentOrThrow
@@ -58,20 +56,20 @@ class MainScreen(private val homeViewModel: HomeViewModel, private val user: Sta
                     when (selectedIndex) {
                         0 -> {
 
-                           return@Column HomeScreen(homeViewModel,favoriteViewModel,user=user,cartViewModel=cartViewModel)
+                           return@Column HomeScreen(authViewModel.homeViewModel,favoriteViewModel,user=authViewModel.user,cartViewModel=cartViewModel)
                         }
                         1 -> {
 
 
-                            return@Column FavoriteScreen(favoriteViewModel,homeViewModel)
+                            return@Column FavoriteScreen(favoriteViewModel,authViewModel.homeViewModel)
                         }
                         2 -> {
 
-                            return@Column CartScreen(cartViewModel=cartViewModel,homeViewModel=homeViewModel,favoriteViewModel=favoriteViewModel)
+                            return@Column CartScreen(cartViewModel=cartViewModel,homeViewModel=authViewModel.homeViewModel,favoriteViewModel=favoriteViewModel)
                         }
                         3 -> {
 
-                            return@Column ProfileScreen(user)
+                            return@Column ProfileScreen(authViewModel)
                         }
                     }
 
@@ -104,7 +102,7 @@ class MainScreen(private val homeViewModel: HomeViewModel, private val user: Sta
 
                     selected =false ,
                     onClick = { selectedIndex=0
-                        println("Categories data:=================================================== ${homeViewModel.categories.value}")
+                        println("Categories data:=================================================== ${authViewModel.homeViewModel.categories.value}")
 
 
 

@@ -3,6 +3,8 @@ package com.example.shopna.data.network
 import com.example.shopna.data.model.AddOrDeleteFavoriteResponse
 import com.example.shopna.data.model.AddOrRemoveCartResponse
 import com.example.shopna.data.model.CategoryDetailsResponse
+import com.example.shopna.data.model.EditProfileRequest
+import com.example.shopna.data.model.EditProfileResponse
 import com.example.shopna.data.model.GetCartResponse
 import com.example.shopna.data.model.GetCategoryResponse
 import com.example.shopna.data.model.GetFavoriteResponse
@@ -10,6 +12,7 @@ import com.example.shopna.data.model.GetUserResponse
 import com.example.shopna.data.model.Home
 import com.example.shopna.data.model.LoginRequest
 import com.example.shopna.data.model.LoginResponse
+import com.example.shopna.data.model.LogoutResponse
 import com.example.shopna.data.model.RegisterRequest
 import com.example.shopna.data.model.RegisterResponse
 import com.example.shopna.data.model.UpdateCartResponse
@@ -35,6 +38,8 @@ interface ApiService{
 
     @POST("login")
     suspend fun login( @Body loginRequest: LoginRequest) : Response<LoginResponse>
+    @POST("logout")
+    suspend fun logout( ) : Response<LogoutResponse>
 
     @GET("profile")
     suspend fun getUser() :Response<GetUserResponse>
@@ -65,6 +70,9 @@ interface ApiService{
     @FormUrlEncoded
     @PUT("carts/{id}")
     suspend fun updateCart(@Path("id") id: Int,  @Field("quantity") quantity:Int): Response<UpdateCartResponse>
+
+    @PUT("update-profile")
+    suspend fun editProfile(@Body editProfileRequest: EditProfileRequest): Response<EditProfileResponse>
 
 
 

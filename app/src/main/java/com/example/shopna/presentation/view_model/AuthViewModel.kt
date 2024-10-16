@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.shopna.data.model.*
 import com.example.shopna.data.network.RetrofitInstance
+import com.example.shopna.presentation.view.authentication.LoginScreen
 import com.example.shopna.presentation.view.home.MainScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,9 +23,14 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
 
     private val _userLoginResponse = MutableStateFlow<LoginResponse?>(null)
     val userLoginResponse: StateFlow<LoginResponse?> get() = _userLoginResponse
+    private val _userLogoutResponse = MutableStateFlow<LogoutResponse?>(null)
+    val userLogoutResponse: StateFlow<LogoutResponse?> get() = _userLogoutResponse
 
     private val _user = MutableStateFlow<GetUserResponse?>(null)
     val user: StateFlow<GetUserResponse?> get() = _user
+
+    private val _editProfile = MutableStateFlow<EditProfileResponse?>(null)
+    val editProfile: StateFlow<EditProfileResponse?> get() = _editProfile
 
     private val api = RetrofitInstance.apiClient
     val homeViewModel = HomeViewModel()
@@ -61,11 +67,11 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
                     _userRegisterResponse.value?.let {
                         RetrofitInstance.setAuthToken(it.data.token)
                     }
-                    saveAuthToken(context, _userLoginResponse.value?.data?.token.toString())
+                    saveAuthToken(context, _userRegisterResponse.value?.data?.token.toString())
                     getUser().let {
                             homeViewModel.getHomeData().let {
                                 homeViewModel.getCategories().let {
-                                    navigator.push(MainScreen(homeViewModel,user))
+                                    navigator.push(MainScreen(AuthViewModel(context = context, navigator = navigator)))
                                     _isLoading.value = false
 
                                 }
@@ -98,7 +104,7 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
                     getUser().let {
                             homeViewModel.getHomeData().let {
                                 homeViewModel.getCategories().let {
-                                    navigator.push(MainScreen(homeViewModel,user))
+                                    navigator.push(MainScreen(AuthViewModel(navigator, context )))
                                     _isLoading.value = false
 
                                 }
@@ -115,12 +121,36 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
             }
         }
     }
+    fun logout() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                if(getAuthToken()!=null){
+                    getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
+                }
+                val response = api.logout()
+                if (response.isSuccessful && response.body()?.status == true) {
+                    _userLogoutResponse.value = response.body()
+                    saveAuthToken(context, null)
+                    navigator.pop()
+                    Toast.makeText(context,response.body()?.message, Toast.LENGTH_SHORT).show()
+
+
+
+                } else {
+                    Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
+            } finally {
+            }
+        }
+    }
 
       private fun getUser() {
           viewModelScope.launch {
-              val response = api.getUser()
               try {
-
+                  val response = api.getUser()
                   Log.d("AuthViewModel", "Get User Response: ${response.body()}")
                   if (response.body()?.status==true) {
                       _user.value = response.body()
@@ -137,28 +167,36 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
 
     }
 
-//    private suspend fun getHomeData(): Boolean {
-//        return try {
-//            _isLoading.value = true
-//            homeViewModel.getHomeData() // Ensure this is a suspend function
-//            homeViewModel.getCategories()
-//
-//            if (homeViewModel.products.value != null && homeViewModel.categories.value != null) {
-//                Log.d("AuthViewModel", "Home data loaded successfully")
-//                true
-//
-//            } else {
-//                Log.e("AuthViewModel", "Home data not loaded")
-//                false
-//            }
-//        } catch (e: Exception) {
-//            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-//            false
-//        } finally {
-//        }
-//    }
+     fun editProfile(editProfileRequest: EditProfileRequest) {
+          viewModelScope.launch {
+              try {
+                  _isLoading.value=true
+                  val response = api.editProfile(editProfileRequest)
+                  if (response.isSuccessful) {
+                      _editProfile.value = response.body()
+                      _editProfile.let {
+                          RetrofitInstance.setAuthToken(_editProfile.value?.data?.token.toString())
 
-    private fun saveAuthToken(context: Context, token: String) {
+                      }
+                      getUser()
+                      Toast.makeText(context, "Data updated successfully", Toast.LENGTH_SHORT).show()
+
+                  } else {
+                      Toast.makeText(context, "Failed to update user", Toast.LENGTH_SHORT).show()
+                  }
+              } catch (e: Exception) {
+                  Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+              }finally {
+                  _isLoading.value=false
+
+              }
+          }
+
+
+    }
+
+
+    private fun saveAuthToken(context: Context, token: String?) {
         val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("token", token)

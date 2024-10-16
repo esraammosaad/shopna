@@ -93,7 +93,11 @@ import kotlinx.coroutines.flow.StateFlow
         homeViewModel.getHomeData()
         val homeData by homeViewModel.products.collectAsState()
         val categories by homeViewModel.categories.collectAsState()
+        val navigator= LocalNavigator.currentOrThrow
         val userData =user.collectAsState()
+
+
+
 
 
 
@@ -131,7 +135,9 @@ import kotlinx.coroutines.flow.StateFlow
                             ))
                         }
                         Row {
-                            CustomIcon(icon =painterResource(id = R.drawable.magnifyingglass) , onClick = {})
+                            CustomIcon(icon =painterResource(id = R.drawable.magnifyingglass) , onClick = {
+                                navigator.push(SearchScreen(homeData?.dataa?.products,homeViewModel,favoriteViewModel,cartViewModel))
+                            })
                             Spacer(modifier = Modifier.width(10.dp))
                             CustomIcon(icon = painterResource(id = R.drawable.notification) , onClick = {})
 

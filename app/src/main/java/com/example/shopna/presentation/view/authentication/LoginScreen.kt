@@ -21,6 +21,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -42,6 +44,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
@@ -124,7 +128,8 @@ class LoginScreen(private val context: Context) : Screen{
                         text = stringResource(id = R.string.password),
                         value = password,
                         error = passwordError.value,
-                        errorMessage = passwordErrorMessage.value
+                        errorMessage = passwordErrorMessage.value,
+                        isPassword = true
                     )
 
                     Spacer(Modifier.height(15.dp))
@@ -165,7 +170,7 @@ class LoginScreen(private val context: Context) : Screen{
                     } )
                 }
             }
-        } else Navigator(MainScreen(authViewModel.homeViewModel,authViewModel.user))
+        } else Navigator(MainScreen(authViewModel))
 
     }
 
@@ -326,8 +331,11 @@ fun CustomTextField(
     text: String,
     value: MutableState<String>,
     error: Boolean,
-    errorMessage: String
+    errorMessage: String,
+    isPassword: Boolean = false
 ) {
+    val passwordVisible = remember { mutableStateOf(false) } // حالة الرؤية لكلمة المرور
+
     Column {
         OutlinedTextField(
             label = {
@@ -357,6 +365,21 @@ fun CustomTextField(
                 cursorColor = kPrimaryColor
             ),
             isError = error,
+            visualTransformation = if (isPassword && !passwordVisible.value) PasswordVisualTransformation() else VisualTransformation.None, // إظهار أو إخفاء النص
+            trailingIcon = {
+                if (isPassword) {
+                    val image = if (passwordVisible.value)
+                         R.drawable.show
+                    else
+                         R.drawable.eye
+
+                    IconButton(onClick = {
+                        passwordVisible.value = !passwordVisible.value
+                    }) {
+                        Icon(painter = painterResource(id = image), contentDescription = null)
+                    }
+                }
+            }
         )
         if (error) {
             Text(
@@ -367,6 +390,7 @@ fun CustomTextField(
         }
     }
 }
+
 
 
 fun validateEmail(context: Context,email: String, errorState: MutableState<Boolean>, errorMessageState: MutableState<String>): Boolean {
