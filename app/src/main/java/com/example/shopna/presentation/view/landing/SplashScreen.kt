@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shopna.ui.theme.kPrimaryColor
@@ -45,7 +46,8 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                 text = stringResource(id = R.string.app_name),
                 style = TextStyle(
                     fontSize = 45.sp,
-                    color = kPrimaryColor
+                    color = kPrimaryColor,
+                    textAlign = TextAlign.Center
                 ),
                 modifier = Modifier
                     .padding(bottom = 100.dp)

@@ -61,7 +61,7 @@ class MainScreen(private val authViewModel: AuthViewModel) :Screen {
                         1 -> {
 
 
-                            return@Column FavoriteScreen(favoriteViewModel,authViewModel.homeViewModel)
+                            return@Column FavoriteScreen(favoriteViewModel,authViewModel.homeViewModel,cartViewModel)
                         }
                         2 -> {
 
@@ -69,7 +69,7 @@ class MainScreen(private val authViewModel: AuthViewModel) :Screen {
                         }
                         3 -> {
 
-                            return@Column ProfileScreen(authViewModel)
+                            return@Column ProfileScreen(authViewModel,cartViewModel)
                         }
                     }
 

@@ -1,5 +1,6 @@
 package com.example.shopna.presentation.view_model
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,13 +10,14 @@ import com.example.shopna.data.model.CategoryDetailsResponse
 import com.example.shopna.data.model.GetCategoryResponse
 import com.example.shopna.data.model.Home
 import com.example.shopna.data.network.RetrofitInstance
+import com.example.shopna.presentation.view.home.updateLocale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(val context: Context) : ViewModel() {
     private val _homeData = MutableStateFlow<Home?>(null)
     val products: StateFlow<Home?> get() = _homeData
 
@@ -34,9 +36,10 @@ class HomeViewModel : ViewModel() {
 
     init {
 
-
         val languageCode = Locale.getDefault().language
-        RetrofitInstance.setLanguage(languageCode)
+        val sharedPreferences =context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        updateLocale(context,sharedPreferences.getString("langCode",languageCode)?:languageCode)
+        RetrofitInstance.setLanguage(sharedPreferences.getString("langCode",languageCode)?:languageCode)
 
     }
 

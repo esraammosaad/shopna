@@ -1,5 +1,6 @@
 package com.example.shopna.presentation.view.home
 
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,7 +36,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -67,6 +68,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.shopna.R
+import com.example.shopna.data.model.AddOrderRequest
 import com.example.shopna.data.model.GetCartResponse
 import com.example.shopna.presentation.view_model.CartViewModel
 import com.example.shopna.presentation.view_model.FavoriteViewModel
@@ -97,7 +99,6 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
             .fillMaxSize()
     ) {
 
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,7 +107,7 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "My Cart",
+                text = stringResource(id = R.string.my_cart),
                 style = TextStyle(
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
@@ -122,7 +123,7 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
 
         if (cartProducts?.data?.cart_items.isNullOrEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "You haven't added any items in your cart", color = greyColor, fontSize = 18.sp)
+                Text(text = stringResource(id = R.string.empty_cart_message), color = greyColor, fontSize = 18.sp)
             }
         } else {
             Box(modifier = Modifier) {
@@ -151,8 +152,11 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
                                                     navigator.push(
                                                         DetailsScreen(
                                                             selectedProduct,
-                                                            favoriteViewModel
-                                                        )
+                                                            favoriteViewModel,
+                                                            cartViewModel,
+
+
+                                                            )
                                                     )
                                                 }
                                         },
@@ -271,7 +275,7 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
                                                     ) {
                                                         Icon(
                                                             imageVector = Icons.Default.Add,
-                                                            contentDescription = "Add",
+                                                            contentDescription = stringResource(id = R.string.add),
                                                             tint = Color.Black,
                                                             modifier = Modifier
                                                                 .clickable {
@@ -326,8 +330,8 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
                                         .align(Alignment.TopStart),
                                     cartProducts = cartProducts,
                                     index = index,
-                                    favoriteViewModel =favoriteViewModel ,
-                                    selectedIndex =selectedIndex
+                                    favoriteViewModel = favoriteViewModel,
+                                    selectedIndex = selectedIndex
                                 )
 
                                 var inCart by remember { mutableStateOf(cartProducts!!.data.cart_items[index].product.in_cart) }
@@ -338,9 +342,9 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
                                         .background(backgroundColor)
                                         .align(Alignment.TopEnd)
                                         .padding(5.dp),
-                                    cartProducts =cartProducts ,
+                                    cartProducts = cartProducts,
                                     selectedIndex = selectedIndex,
-                                    cartViewModel =cartViewModel,
+                                    cartViewModel = cartViewModel,
                                     index = index,
                                     onClick = {
                                         cartViewModel.addOrDeleteCart(cartProducts!!.data.cart_items[index].product.id)
@@ -352,7 +356,6 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
                                 )
                             }
                         }
-
                     }
 
                     item {
@@ -367,11 +370,12 @@ fun CartScreen(cartViewModel: CartViewModel, homeViewModel: HomeViewModel, favor
                             LocalConfiguration.current.screenHeightDp.dp / 4
                         )
                         .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
-                        .background(Color.White), promoCode = promoCode, cartProducts = cartProducts)
+                        .background(Color.White), promoCode = promoCode, cartProducts = cartProducts,cartViewModel)
             }
         }
     }
 }
+
 
 
 @Composable
@@ -381,21 +385,19 @@ fun FavoriteIcon(
     index: Int,
     favoriteViewModel: FavoriteViewModel,
     selectedIndex: MutableState<Int>
-){
+) {
     val favoriteIsLoading by favoriteViewModel.isLoading.collectAsState()
     Box(
-        modifier = modifier) {
+        modifier = modifier
+    ) {
         var isFavorite by remember { mutableStateOf(cartProducts!!.data.cart_items[index].product.in_favorites) }
         IconButton(
             onClick = {
-
                 selectedIndex.value = index
                 favoriteViewModel.addOrDeleteFavorite(cartProducts!!.data.cart_items[index].product.id)
                 isFavorite = !isFavorite
                 favoriteViewModel.fetchFavorites()
                 cartProducts.data.cart_items[index].product.in_favorites = isFavorite
-
-
             },
             modifier = Modifier.size(22.dp)
         ) {
@@ -403,11 +405,13 @@ fun FavoriteIcon(
                 CircularProgressIndicator(
                     color = kPrimaryColor,
                     modifier = Modifier.size(13.dp)
-                ) else Icon(
-                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
-                contentDescription = "Favorite",
-                tint = kPrimaryColor.copy(alpha = 0.8f)
-            )
+                )
+            else
+                Icon(
+                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = stringResource(id = R.string.favorite),
+                    tint = kPrimaryColor.copy(alpha = 0.8f)
+                )
         }
     }
 }
@@ -416,11 +420,11 @@ fun FavoriteIcon(
 fun DeleteFromCart(
     modifier: Modifier,
     cartProducts: GetCartResponse?,
-    selectedIndex:MutableState<Int>,
+    selectedIndex: MutableState<Int>,
     cartViewModel: CartViewModel,
     index: Int,
-    onClick:()->Unit
-){
+    onClick: () -> Unit
+) {
     Box(
         modifier = modifier
     ) {
@@ -432,7 +436,6 @@ fun DeleteFromCart(
                 .background(kPrimaryColor)
                 .align(Alignment.Center)
         ) {
-
             IconButton(
                 modifier = Modifier
                     .fillMaxSize()
@@ -448,46 +451,50 @@ fun DeleteFromCart(
                 } else {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Remove from cart",
+                        contentDescription = "delete from cart",
                         tint = Color.White.copy(alpha = 0.8f),
                         modifier = Modifier
                             .size(12.dp)
                             .align(Alignment.Center)
                     )
                 }
-
-
-
-
-
             }
-
-
         }
     }
 }
 
 
 
+
 @Composable
 fun CheckOutSection(
-    modifier: Modifier, promoCode:MutableState<String>,
-    cartProducts: GetCartResponse?
-){
-    Box(modifier = modifier){
-        Column (modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 18.dp, end = 18.dp, top = 35.dp)
-        ){
-            PromoCodeField(promoCode = promoCode.value, onApplyClick = { /*TODO*/ }, onPromoCodeChange = {
-                promoCode.value=it
-            })
-            Spacer(modifier = Modifier.height(18.dp))
-            Card(modifier = Modifier
+    modifier: Modifier, promoCode: MutableState<String>,
+    cartProducts: GetCartResponse?,
+    cartViewModel: CartViewModel
+) {
+    val context = LocalContext.current
+    val navigator = LocalNavigator.currentOrThrow
+    val order= cartViewModel.addOrderResponse.collectAsState()
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp),
+                .padding(start = 18.dp, end = 18.dp, top = 35.dp)
+        ) {
+            PromoCodeField(
+                promoCode = promoCode.value,
+                onApplyClick = { /*TODO*/ },
+                onPromoCodeChange = {
+                    promoCode.value = it
+                }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation =  CardDefaults. cardElevation(5.dp),
+                elevation = CardDefaults.cardElevation(5.dp),
                 shape = RoundedCornerShape(5.dp)
             ) {
                 Row(
@@ -495,51 +502,60 @@ fun CheckOutSection(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically) {
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     Row {
 
-                        Text(text = "Total: ",
+                        Text(
+                            text = stringResource(id = R.string.total),
                             style = TextStyle(
                                 fontSize = 12.sp,
                                 color = Color(0xff868889)
                             )
-
                         )
-                        Text(text = String.format(Locale.getDefault(),"%.1f", cartProducts!!.data.total) + stringResource(id = R.string.currency_egp),
+                        Text(
+                            text = String.format(
+                                Locale.getDefault(),
+                                "%.1f",
+                                cartProducts!!.data.total
+                            ) + stringResource(id = R.string.currency_egp),
                             style = TextStyle(
                                 fontSize = 12.sp,
                                 color = kPrimaryColor
                             )
-
                         )
 
                     }
 
-
                     Button(
-                        onClick = {},
+                        onClick = {
+
+                            cartViewModel.addOrder(AddOrderRequest(
+                                address_id = 35,
+                                payment_method =1 ,
+                                use_points = false
+                            ))
+
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = kPrimaryColor),
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier
-                            .width(LocalConfiguration.current.screenWidthDp.dp / 3)
+                            .width(LocalConfiguration.current.screenWidthDp.dp / 2)
                             .padding(8.dp)
-
                     ) {
-                        Text(text = "Check Out", fontSize = 12.sp)
-
+                        if(cartViewModel.isLoading.collectAsState().value) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(12.dp)) else Text(
+                            text = stringResource(id = R.string.check_out),
+                            fontSize = 12.sp
+                        )
                     }
 
-
-
-
-
                 }
-
             }
         }
     }
 }
+
 @Composable
 fun PromoCodeField(
     promoCode: String,
@@ -577,7 +593,7 @@ fun PromoCodeField(
                 onValueChange = onPromoCodeChange,
                 modifier = Modifier
                     .matchParentSize(),
-                placeholder = { Text("Enter Promo Code",fontSize = 12.sp) },
+                placeholder = { Text(stringResource(id = R.string.enter_promo_code), fontSize = 12.sp) },
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = Color.Transparent,
                     focusedBorderColor = Color.Transparent,
@@ -597,13 +613,14 @@ fun PromoCodeField(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDE9FE))
         ) {
             Text(
-                text = "Applied",
+                text = stringResource(id = R.string.applied),
                 color = Color(0xFF4A4A4A),
                 style = MaterialTheme.typography.bodySmall
             )
         }
     }
 }
+
 
 
 

@@ -52,20 +52,20 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.AsyncImage
 import com.example.shopna.R
+import com.example.shopna.presentation.view_model.CartViewModel
 import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.greyColor
 import com.example.shopna.ui.theme.kPrimaryColor
 
 @Composable
-fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeViewModel) {
+fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeViewModel, cartViewModel: CartViewModel) {
     favoriteViewModel.fetchFavorites()
     val navigator = LocalNavigator.currentOrThrow
     val favoriteProducts by favoriteViewModel.favoriteData.collectAsState()
     val homeData = homeViewModel.products.collectAsState()
     var selectedIndex by remember { mutableIntStateOf(0) }
     val favoriteIsLoading by favoriteViewModel.isLoading.collectAsState()
-
 
     Column(
         modifier = Modifier
@@ -94,7 +94,7 @@ fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeView
         }
         if (favoriteProducts?.data?.data.isNullOrEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "No favorites yet ;(", color = greyColor, fontSize = 18.sp)
+                Text(text = stringResource(id = R.string.no_favorites), color = greyColor, fontSize = 18.sp)
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -109,7 +109,7 @@ fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeView
                                     .clip(RoundedCornerShape(12.dp))
                                     .clickable {
                                         homeData.value?.dataa?.products?.find { it.id == favoriteProduct.product.id }
-                                            ?.let { it1 -> navigator.push(DetailsScreen(it1, favoriteViewModel)) }
+                                            ?.let { it1 -> navigator.push(DetailsScreen(it1, favoriteViewModel, cartViewModel)) }
                                     },
                                 colors = CardDefaults.cardColors(containerColor = Color(0xfff8f8f8))
                             ) {
@@ -234,6 +234,7 @@ fun FavoriteScreen(favoriteViewModel: FavoriteViewModel, homeViewModel: HomeView
         }
     }
 }
+
 
 
 

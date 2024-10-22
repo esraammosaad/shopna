@@ -2,17 +2,21 @@ package com.example.shopna.data.network
 
 import com.example.shopna.data.model.AddOrDeleteFavoriteResponse
 import com.example.shopna.data.model.AddOrRemoveCartResponse
+import com.example.shopna.data.model.AddOrderRequest
+import com.example.shopna.data.model.AddOrderResponse
 import com.example.shopna.data.model.CategoryDetailsResponse
 import com.example.shopna.data.model.EditProfileRequest
 import com.example.shopna.data.model.EditProfileResponse
 import com.example.shopna.data.model.GetCartResponse
 import com.example.shopna.data.model.GetCategoryResponse
 import com.example.shopna.data.model.GetFavoriteResponse
+import com.example.shopna.data.model.GetOrderResponse
 import com.example.shopna.data.model.GetUserResponse
 import com.example.shopna.data.model.Home
 import com.example.shopna.data.model.LoginRequest
 import com.example.shopna.data.model.LoginResponse
 import com.example.shopna.data.model.LogoutResponse
+import com.example.shopna.data.model.OrderDetailsResponse
 import com.example.shopna.data.model.RegisterRequest
 import com.example.shopna.data.model.RegisterResponse
 import com.example.shopna.data.model.UpdateCartResponse
@@ -59,6 +63,15 @@ interface ApiService{
     @FormUrlEncoded
     @POST("favorites")
     suspend fun addOrDeleteFavorites(@Field("product_id") productId: Int): Response<AddOrDeleteFavoriteResponse>
+
+    @POST("orders")
+    suspend fun addOrder(@Body addOrderRequest: AddOrderRequest): Response<AddOrderResponse>
+
+    @GET("orders")
+    suspend fun getOrders():Response<GetOrderResponse>
+
+    @GET("orders/{id}")
+    suspend fun getOrderDetails(@Path("id") id: Int):Response<OrderDetailsResponse>
 
     @GET("carts")
     suspend fun getCart():Response<GetCartResponse>

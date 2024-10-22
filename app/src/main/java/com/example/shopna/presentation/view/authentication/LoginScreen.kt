@@ -334,7 +334,7 @@ fun CustomTextField(
     errorMessage: String,
     isPassword: Boolean = false
 ) {
-    val passwordVisible = remember { mutableStateOf(false) } // حالة الرؤية لكلمة المرور
+    val passwordVisible = remember { mutableStateOf(false) }
 
     Column {
         OutlinedTextField(

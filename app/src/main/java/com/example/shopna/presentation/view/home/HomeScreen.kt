@@ -91,6 +91,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 
         homeViewModel.getHomeData()
+        homeViewModel.getCategories()
         val homeData by homeViewModel.products.collectAsState()
         val categories by homeViewModel.categories.collectAsState()
         val navigator= LocalNavigator.currentOrThrow
@@ -153,7 +154,9 @@ import kotlinx.coroutines.flow.StateFlow
                 }
                 Spacer(modifier = Modifier.height(4.dp))
 
-                CustomText(text = stringResource(id = R.string.categories))
+                CustomText(text = stringResource(id = R.string.categories), clickable = {
+                    navigator.push(SeeAllCategories(categories?.data?.data!!,homeViewModel,favoriteViewModel,cartViewModel))
+                })
                 Spacer(modifier = Modifier.height(4.dp))
                 if (homeViewModel.categories == null) {
                     Box(
@@ -172,7 +175,9 @@ import kotlinx.coroutines.flow.StateFlow
             }
 
             item{
-                CustomText(text = stringResource(id = R.string.recommendations))
+                CustomText(text = stringResource(id = R.string.recommendations), clickable = {
+                    navigator.push(SeeAllProducts(homeViewModel,favoriteViewModel,cartViewModel))
+                })
 
 
 
@@ -267,7 +272,7 @@ fun CashBackCard(){
 
 
 @Composable
-private fun CustomText(text:String) {
+private fun CustomText(text:String,clickable:()->Unit={}) {
     Row (modifier =
     Modifier
         .padding(vertical = 8.dp)
@@ -286,6 +291,10 @@ private fun CustomText(text:String) {
         )
         Text(
             stringResource(id = R.string.see_all),
+            modifier = Modifier.clickable {
+
+                clickable()
+            },
             style = TextStyle(
                 color = kPrimaryColor,
                 fontSize = 13.sp,
@@ -417,7 +426,11 @@ fun ProductItem(product: Products, favoriteViewModel: FavoriteViewModel, indexOf
             modifier = Modifier
                 .height(195.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .clickable { navigator.push(DetailsScreen(product, favoriteViewModel)) },
+                .clickable { navigator.push(DetailsScreen(
+                    product,
+                    favoriteViewModel,
+                    cartViewModel,
+                )) },
             colors = CardDefaults.cardColors(containerColor = Color.White)
 
         ) {

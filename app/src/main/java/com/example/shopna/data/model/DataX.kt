@@ -1,7 +1,7 @@
 package com.example.shopna.data.model
 
 data class DataX(
-    val credit: Int,
+    val credit: Double,
     val email: String,
     val id: Int,
     val image: String,

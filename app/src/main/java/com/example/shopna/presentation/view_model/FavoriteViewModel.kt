@@ -8,6 +8,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.example.shopna.data.model.AddOrDeleteFavoriteResponse
 import com.example.shopna.data.model.GetFavoriteResponse
 import com.example.shopna.data.network.RetrofitInstance
+import com.example.shopna.presentation.view.home.updateLocale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -29,8 +30,12 @@ class FavoriteViewModel(navigator: Navigator, context: Context) : ViewModel() {
     private var dataFetched = false
 
     init {
-        val languageCode = Locale.getDefault().language
-        RetrofitInstance.setLanguage(languageCode)
+//        val languageCode = Locale.getDefault().language
+//        RetrofitInstance.setLanguage(languageCode)
+        val languageCode = java.util.Locale.getDefault().language
+        val sharedPreferences =context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        updateLocale(context,sharedPreferences.getString("langCode",languageCode)?:languageCode)
+        RetrofitInstance.setLanguage(sharedPreferences.getString("langCode",languageCode)?:languageCode)
     }
 
     fun fetchFavorites(forceRefresh: Boolean = false) {

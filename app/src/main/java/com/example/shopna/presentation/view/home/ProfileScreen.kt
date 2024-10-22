@@ -1,5 +1,6 @@
 package com.example.shopna.presentation.view.home
 
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -7,22 +8,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,7 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -55,17 +49,18 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import coil.compose.rememberAsyncImagePainter
 import com.example.shopna.R
 import com.example.shopna.presentation.view_model.AuthViewModel
+import com.example.shopna.presentation.view_model.CartViewModel
 import com.example.shopna.ui.theme.backgroundColor
 import com.example.shopna.ui.theme.kPrimaryColor
 import com.example.shopna.ui.theme.lightGreyColor
 
-
 @Composable
-fun ProfileScreen(authViewModel: AuthViewModel) {
+fun ProfileScreen(authViewModel: AuthViewModel,cartViewModel: CartViewModel) {
     val userData = authViewModel.user.collectAsState()
     var isClicked by remember { mutableStateOf(false) }
     val imageUrl = rememberSaveable { mutableStateOf(userData.value?.data?.image ?: "") }
     val painter = rememberAsyncImagePainter(imageUrl.value)
+
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -97,7 +92,7 @@ fun ProfileScreen(authViewModel: AuthViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "My Profile",
+                        text = stringResource(id = R.string.my_profile), // Use string resource
                         style = TextStyle(
                             fontSize = 25.sp,
                             fontWeight = FontWeight.Bold,
@@ -109,7 +104,7 @@ fun ProfileScreen(authViewModel: AuthViewModel) {
                     IconButton(onClick = {}) {
                         Icon(
                             painter = painterResource(id = R.drawable.settings),
-                            contentDescription = "",
+                            contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(20.dp)
                         )
@@ -125,7 +120,7 @@ fun ProfileScreen(authViewModel: AuthViewModel) {
                 Box(modifier = Modifier.size(100.dp)) {
                     Image(
                         painter = rememberAsyncImagePainter("https://student.valuxapps.com/storage/assets/defaults/user.jpg"),
-                        contentDescription = "User Profile Picture",
+                        contentDescription = stringResource(id = R.string.user_profile_picture), // Use string resource
                         modifier = Modifier
                             .size(100.dp)
                             .clip(CircleShape)
@@ -135,13 +130,12 @@ fun ProfileScreen(authViewModel: AuthViewModel) {
 
                     Icon(
                         painter = painterResource(id = R.drawable.pen),
-                        contentDescription = "Edit Profile Picture",
+                        contentDescription = stringResource(id = R.string.edit_profile_picture), // Use string resource
                         modifier = Modifier
                             .size(24.dp)
                             .align(Alignment.BottomEnd)
                             .clickable {
                                 launcher.launch("image/*")
-
                             }
                             .background(backgroundColor, shape = CircleShape)
                             .padding(5.dp),
@@ -154,11 +148,11 @@ fun ProfileScreen(authViewModel: AuthViewModel) {
         Spacer(modifier = Modifier.height(5.dp))
 
         Text(
-            text = userData.value?.data?.name ?: "User Name",
+            text = userData.value?.data?.name ?: stringResource(id = R.string.default_user_name), // Use string resource
             style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold),
         )
         Text(
-            text = userData.value?.data?.email ?: "email",
+            text = userData.value?.data?.email ?: stringResource(id = R.string.default_email), // Use string resource
             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Gray.copy(alpha = 0.4f)),
             modifier = Modifier.padding(top = 2.dp)
         )
@@ -173,28 +167,25 @@ fun ProfileScreen(authViewModel: AuthViewModel) {
         ) {
             Column {
                 OptionRow(
-                    optionText = "Dark Mode",
+                    optionText = stringResource(id = R.string.dark_mode), // Use string resource
                     onClick = { isClicked = !isClicked },
                     isToggle = true,
                     isChecked = isClicked,
                     icon = R.drawable.nightmode
                 )
-                OptionRow(optionText = "Edit Profile", onClick = {
-                    navigator.push(EditProfile( authViewModel))
+                OptionRow(optionText = stringResource(id = R.string.edit_profile), onClick = {
+                    navigator.push(EditProfile(authViewModel))
                 }, icon = R.drawable.avatar)
                 Spacer(modifier = Modifier.height(5.dp))
-                OptionRow(optionText = "Orders", onClick = {}, icon = R.drawable.orderdelivery)
+                OptionRow(optionText = stringResource(id = R.string.orders), onClick = {
+                    cartViewModel.getOrders()
+                    navigator.push(OrdersScreen(cartViewModel))}, icon = R.drawable.orderdelivery)
                 Spacer(modifier = Modifier.height(5.dp))
-                OptionRow(optionText = "Addresses", onClick = {}, icon = R.drawable.maps)
+                OptionRow(optionText = stringResource(id = R.string.language), onClick = {
+                    navigator.push(LanguageScreen())
+                }, icon = R.drawable.arabic)
                 Spacer(modifier = Modifier.height(5.dp))
-                OptionRow(optionText = "Language", onClick = {}, icon = R.drawable.arabic)
-                Spacer(modifier = Modifier.height(5.dp))
-                OptionRow(optionText = "Credit Cards", onClick = {}, icon = R.drawable.creditcard)
-                Spacer(modifier = Modifier.height(5.dp))
-                OptionRow(optionText = "Transactions", onClick = {}, icon = R.drawable.moneyexchange)
-                Spacer(modifier = Modifier.height(5.dp))
-                OptionRow(optionText = "Logout", onClick = {
-
+                OptionRow(optionText = stringResource(id = R.string.logout), onClick = {
                     authViewModel.logout()
                 }, icon = R.drawable.logout)
             }
@@ -205,11 +196,14 @@ fun ProfileScreen(authViewModel: AuthViewModel) {
 @Composable
 fun OptionRow(
     optionText: String,
-    onClick:() -> Unit,
+    onClick: () -> Unit,
     isToggle: Boolean = false,
     isChecked: Boolean = false,
     icon: Int
 ) {
+    val context = LocalContext.current
+    val sharedPreferences =context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+    val langCode = sharedPreferences.getString("langCode", "en")
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,7 +213,7 @@ fun OptionRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(painter = painterResource(id = icon), contentDescription ="", tint = kPrimaryColor.copy(alpha = 0.5f))
+            Icon(painter = painterResource(id = icon), contentDescription = null, tint = kPrimaryColor.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
@@ -238,12 +232,10 @@ fun OptionRow(
             ))
         } else {
             Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "Navigate",
+                imageVector = if (langCode == "ar") Icons.Default.KeyboardArrowLeft else Icons.Default.KeyboardArrowRight,
+                contentDescription = stringResource(id = R.string.navigate), // Use string resource
                 tint = Color.Gray
             )
         }
     }
 }
-
-

@@ -52,6 +52,72 @@
     <string name="favorite" translatable="false">المفضلة</string>
     <string name="percent_off" translatable="false"> % خصم </string>
     <string name="currency_egp" translatable="false">جنيه</string>
+    <string name="total">الإجمالي:</string>
+    <string name="check_out">إتمام الشراء</string>
+    <string name="enter_promo_code">أدخل رمز الخصم</string>
+    <string name="applied">تم التطبيق</string>
+    <string name="my_cart">عربة التسوق</string>
+    <string name="empty_cart_message">لم تقم بإضافة أي منتجات إلى سلتك</string>
+    <string name="add">إضافة</string>
+    <string name="back_to_home">العودة إلى الصفحة الرئيسية</string>
+    <string name="quantity">الكمية</string>
+    <string name="show_more">عرض المزيد</string>
+    <string name="show_less">عرض أقل</string>
+    <string name="remove_from_cart">إزالة من العربة</string>
+    <string name="no_description">لا يوجد وصف</string>
+    <string name="warning">تحذير</string>
+    <string name="mobile_phone">رقم الهاتف</string>
+    <string name="mobile_phone_empty_error">رقم الهاتف لا يمكن أن يكون فارغًا</string>
+    <string name="edit_profile">تعديل الملف الشخصي</string>
+    <string name="profile_picture">صورة الملف الشخصي</string>
+    <string name="edit_profile_picture">تعديل صورة الملف الشخصي</string>
+    <string name="no_change_name">لم تقم بتغيير الاسم.</string>
+    <string name="no_change_email">لم تقم بتغيير البريد الإلكتروني.</string>
+    <string name="no_change_phone">لم تقم بتغيير رقم الهاتف.</string>
+    <string name="ok">موافق</string>
+    <string name="no_favorites">لا توجد عناصر مفضلة ;(</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_english">الإنجليزية</string>
+    <string name="change_language">تغيير اللغة</string>
+    <string name="arabic">العربية</string>
+    <string name="english">الإنجليزية</string>
+    <string name="back">رجوع</string>
+    <string name="my_profile">ملفي الشخصي</string>
+    <string name="user_profile_picture">صورة ملف المستخدم</string>
+    <string name="default_user_name">اسم المستخدم</string>
+    <string name="default_email">البريد الإلكتروني</string>
+    <string name="dark_mode">الوضع الليلي</string>
+    <string name="orders">الطلبات</string>
+    <string name="addresses">العناوين</string>
+    <string name="language">اللغة</string>
+    <string name="credit_cards">بطاقات الائتمان</string>
+    <string name="transactions">المعاملات</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="navigate">انتقل إلى</string>
+    <string name="no_orders_found">لم يتم العثور على طلبات</string>
+    <string name="order_id">رقم الطلب: %1$s</string>
+    <string name="total_amount">الإجمالي: %1$s جنيه</string>
+    <string name="order_date">التاريخ: %1$s</string>
+    <string name="order_status">الحالة: %1$s</string>
+    <string name="order_details">تفاصيل الطلب</string>
+    <string name="loading">جار التحميل...</string>
+    <string name="discount_amount">الخصم: %1$s جنيه</string>
+    <string name="payment_method">طريقة الدفع: %1$s</string>
+    <string name="delivery_address">عنوان التوصيل</string>
+    <string name="address_details">التفاصيل: %1$s</string>
+    <string name="notes">ملاحظات: %1$s</string>
+    <string name="products">المنتجات</string>
+    <string name="price">السعر: %1$s جنيه</string>
+    <string name="search">بحث</string>
+    <string name="see_all_products">كل المنتجات</string>
+    <string name="see_all_categories">كل الفئات</string>">
+
+
+
+
+
+
+
 
 
 </resources>

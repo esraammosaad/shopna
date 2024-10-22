@@ -11,6 +11,7 @@ import com.example.shopna.data.model.*
 import com.example.shopna.data.network.RetrofitInstance
 import com.example.shopna.presentation.view.authentication.LoginScreen
 import com.example.shopna.presentation.view.home.MainScreen
+import com.example.shopna.presentation.view.home.updateLocale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
     val editProfile: StateFlow<EditProfileResponse?> get() = _editProfile
 
     private val api = RetrofitInstance.apiClient
-    val homeViewModel = HomeViewModel()
+    val homeViewModel = HomeViewModel(context)
 
 
     init {
@@ -43,8 +44,10 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
         homeViewModel.getHomeData()
         homeViewModel.getCategories()
         }
+        val sharedPreferences =context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         val languageCode = Locale.getDefault().language
-        RetrofitInstance.setLanguage(languageCode)
+        updateLocale(context,sharedPreferences.getString("langCode",languageCode)?:languageCode)
+        RetrofitInstance.setLanguage(sharedPreferences.getString("langCode",languageCode)?:languageCode)
     }
 
 
@@ -118,10 +121,13 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
             } catch (e: Exception) {
                 Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
             } finally {
+                _isLoading.value = false
+
             }
         }
     }
     fun logout() {
+        navigator.push(LoginScreen(context))
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -132,7 +138,6 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
                 if (response.isSuccessful && response.body()?.status == true) {
                     _userLogoutResponse.value = response.body()
                     saveAuthToken(context, null)
-                    navigator.pop()
                     Toast.makeText(context,response.body()?.message, Toast.LENGTH_SHORT).show()
 
 
