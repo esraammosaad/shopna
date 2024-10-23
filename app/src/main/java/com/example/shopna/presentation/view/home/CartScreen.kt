@@ -544,7 +544,7 @@ fun CheckOutSection(
                             .width(LocalConfiguration.current.screenWidthDp.dp / 2)
                             .padding(8.dp)
                     ) {
-                        if(cartViewModel.isLoading.collectAsState().value) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(12.dp)) else Text(
+                        Text(
                             text = stringResource(id = R.string.check_out),
                             fontSize = 12.sp
                         )
