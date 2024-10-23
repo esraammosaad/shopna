@@ -127,20 +127,20 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
         }
     }
     fun logout() {
-        navigator.push(LoginScreen(context))
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                if(getAuthToken()!=null){
+                if (getAuthToken() != null) {
                     getAuthToken()?.let { RetrofitInstance.setAuthToken(it) }
                 }
                 val response = api.logout()
                 if (response.isSuccessful && response.body()?.status == true) {
                     _userLogoutResponse.value = response.body()
                     saveAuthToken(context, null)
-                    Toast.makeText(context,response.body()?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, response.body()?.message, Toast.LENGTH_SHORT).show()
 
-
+                    // Navigate to LoginScreen after successful logout
+                    navigator.push(LoginScreen(context))
 
                 } else {
                     Toast.makeText(context, "${response.body()?.message}", Toast.LENGTH_SHORT).show()
@@ -148,11 +148,13 @@ class AuthViewModel(private val navigator: Navigator, private val context: Conte
             } catch (e: Exception) {
                 Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
             } finally {
+                _isLoading.value = false
             }
         }
     }
 
-      private fun getUser() {
+
+    private fun getUser() {
           viewModelScope.launch {
               try {
                   val response = api.getUser()

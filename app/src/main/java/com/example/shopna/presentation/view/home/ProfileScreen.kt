@@ -166,13 +166,13 @@ fun ProfileScreen(authViewModel: AuthViewModel,cartViewModel: CartViewModel) {
             colors = CardDefaults.cardColors(containerColor = backgroundColor)
         ) {
             Column {
-                OptionRow(
-                    optionText = stringResource(id = R.string.dark_mode), // Use string resource
-                    onClick = { isClicked = !isClicked },
-                    isToggle = true,
-                    isChecked = isClicked,
-                    icon = R.drawable.nightmode
-                )
+//                OptionRow(
+//                    optionText = stringResource(id = R.string.dark_mode), // Use string resource
+//                    onClick = { isClicked = !isClicked },
+//                    isToggle = true,
+//                    isChecked = isClicked,
+//                    icon = R.drawable.nightmode
+//                )
                 OptionRow(optionText = stringResource(id = R.string.edit_profile), onClick = {
                     navigator.push(EditProfile(authViewModel))
                 }, icon = R.drawable.avatar)

@@ -36,17 +36,17 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.shopna.R
+import com.example.shopna.data.model.Data
+import com.example.shopna.data.model.Products
 import com.example.shopna.presentation.view_model.CartViewModel
 import com.example.shopna.presentation.view_model.FavoriteViewModel
 import com.example.shopna.presentation.view_model.HomeViewModel
 import com.example.shopna.ui.theme.kPrimaryColor
 
-class SeeAllProducts(private val homeViewModel: HomeViewModel, private val favoriteViewModel: FavoriteViewModel, val cartViewModel: CartViewModel) : Screen {
+class SeeAllProducts(val products:  List<Products>,val  homeViewModel: HomeViewModel, private val favoriteViewModel: FavoriteViewModel, val cartViewModel: CartViewModel) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val categoryProducts = homeViewModel.products.collectAsState()
-
         val context = LocalContext.current
         val sharedPreferences =context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
         val langCode = sharedPreferences.getString("langCode", "en")
@@ -99,7 +99,7 @@ class SeeAllProducts(private val homeViewModel: HomeViewModel, private val favor
                         )
                     }
                 } else {
-                    categoryProducts.value?.dataa?.products?.let { products ->
+
                         ProductGrid(
                             products,
                             favoriteViewModel,
@@ -108,7 +108,7 @@ class SeeAllProducts(private val homeViewModel: HomeViewModel, private val favor
                                 .height(LocalConfiguration.current.screenHeightDp.dp),
                             cartViewModel
                         )
-                    }
+
                 }
             }
         }

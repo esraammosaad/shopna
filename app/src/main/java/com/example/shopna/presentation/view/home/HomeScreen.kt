@@ -176,7 +176,11 @@ import kotlinx.coroutines.flow.StateFlow
 
             item{
                 CustomText(text = stringResource(id = R.string.recommendations), clickable = {
-                    navigator.push(SeeAllProducts(homeViewModel,favoriteViewModel,cartViewModel))
+
+                    homeData?.dataa?.products?.let { products ->
+                        navigator.push(SeeAllProducts(products,homeViewModel,favoriteViewModel,cartViewModel))
+                    }
+
                 })
 
 
